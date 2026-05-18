@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>octl — Coming soon</title>
+  <meta name="description" content="octl (pronounced &quot;octal&quot;) — AI-native productivity for individuals and teams." />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta property="og:title" content="octl — Coming soon" />
+  <meta property="og:description" content="AI-native productivity for individuals and teams." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://octl.ai/" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --ink: #f5f4f1;
+      --ink-dim: #c8c6c0;
+      --muted: #888782;
+      --line: #232220;
+      --accent: #fbbf24;
+      --accent-soft: rgba(251, 191, 36, 0.45);
+      --max: 720px;
+      --mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-weight: 400;
+      color: var(--ink);
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 65% 55% at 50% 30%, rgba(251, 191, 36, 0.045), transparent 75%),
+        radial-gradient(ellipse 90% 70% at 50% 100%, rgba(245, 244, 241, 0.025), transparent 65%);
+      background-attachment: fixed;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-feature-settings: 'cv11', 'ss01', 'ss03';
+      line-height: 1.5;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      animation: pageIn 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+    }
+
+    @keyframes pageIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Grain overlay — adds quiet warmth without files */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.5;
+      mix-blend-mode: overlay;
+      z-index: 0;
+    }
+
+    header, main, footer { position: relative; z-index: 1; }
+
+    header, footer {
+      padding: 28px 40px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .mark {
+      font-family: var(--mono);
+      font-weight: 400;
+      font-size: 13px;
+      letter-spacing: 0.01em;
+      color: var(--ink-dim);
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-dim);
+      padding: 6px 12px 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.015);
+    }
+
+    .status-dot {
+      position: relative;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--accent);
+      flex: none;
+    }
+
+    .status-dot::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0.6;
+      animation: pulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+
+    @keyframes pulse {
+      0%   { transform: scale(0.6); opacity: 0.6; }
+      80%  { transform: scale(2.2); opacity: 0; }
+      100% { transform: scale(2.2); opacity: 0; }
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 40px 96px;
+    }
+
+    .stack {
+      width: 100%;
+      max-width: var(--max);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .hero {
+      position: relative;
+      display: inline-block;
+      margin: 0;
+    }
+
+    .wordmark {
+      font-size: clamp(5rem, 14vw, 10rem);
+      font-weight: 600;
+      letter-spacing: -0.055em;
+      line-height: 0.9;
+      color: var(--ink);
+      margin: 0;
+      display: inline-block;
+      background: linear-gradient(180deg, var(--ink) 0%, var(--ink-dim) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .glyph {
+      position: absolute;
+      top: -14px;
+      right: -64px;
+      width: 48px;
+      height: auto;
+      color: var(--accent);
+      opacity: 0.85;
+      animation: float 7s ease-in-out infinite;
+    }
+
+    .glyph path {
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50%      { transform: translateY(-8px) rotate(2deg); }
+    }
+
+    .ipa {
+      font-family: var(--mono);
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--muted);
+      margin: 24px 0 0;
+      letter-spacing: 0.01em;
+    }
+
+    .ipa-sep { color: var(--line); margin: 0 8px; }
+
+    .tagline {
+      font-size: clamp(1.125rem, 2vw, 1.375rem);
+      font-weight: 400;
+      color: var(--ink-dim);
+      letter-spacing: -0.013em;
+      line-height: 1.4;
+      margin: 56px 0 64px;
+      max-width: 32ch;
+    }
+
+    .meta {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      border-top: 1px solid var(--line);
+      padding-top: 24px;
+      width: 100%;
+    }
+
+    .meta-row {
+      display: flex;
+      gap: 24px;
+      font-size: 14px;
+      line-height: 1.5;
+      align-items: baseline;
+    }
+
+    .meta-label {
+      flex: 0 0 110px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .meta-value {
+      color: var(--ink);
+    }
+
+    a {
+      color: var(--ink);
+      text-decoration: none;
+      border-bottom: 1px solid var(--line);
+      transition: border-color 200ms ease, color 200ms ease;
+    }
+
+    a:hover {
+      border-bottom-color: var(--accent);
+      color: var(--accent);
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      border-top: 1px solid var(--line);
+      margin: 0 40px;
+      padding: 24px 0;
+    }
+
+    @media (max-width: 640px) {
+      header, main { padding-left: 24px; padding-right: 24px; }
+      header { padding-top: 20px; padding-bottom: 20px; }
+      footer { margin: 0 24px; padding: 20px 0; }
+      main { padding-top: 24px; padding-bottom: 64px; }
+      .status { padding: 5px 10px 5px 9px; letter-spacing: 0.14em; }
+      .glyph {
+        position: static;
+        margin: 0 0 12px;
+        width: 38px;
+      }
+      .wordmark { letter-spacing: -0.045em; }
+      .tagline { font-size: 1.0625rem; margin: 36px 0 44px; max-width: none; }
+      .meta-label { flex: 0 0 90px; font-size: 10.5px; }
+      .meta-row { font-size: 13px; gap: 16px; }
+      footer { flex-direction: column; gap: 6px; align-items: flex-start; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      body, .glyph, .status-dot::after { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="mark">octl.ai</span>
+    <span class="status">
+      <span class="status-dot" aria-hidden="true"></span>
+      Coming soon
+    </span>
+  </header>
+
+  <main>
+    <div class="stack">
+      <div class="hero">
+        <svg class="glyph" viewBox="0 0 80 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M 40 8 Q 58 38 48 70 Q 36 100 56 132 Q 70 156 52 174 Q 38 184 40 168" />
+        </svg>
+        <h1 class="wordmark">octl</h1>
+        <p class="ipa">/&#39;ɒktəl/<span class="ipa-sep">·</span>pronounced &ldquo;octal&rdquo;</p>
+      </div>
+
+      <p class="tagline">AI-native productivity for individuals and teams.</p>
+    </div>
+  </main>
+
+  <footer>
+    <span>&copy; 2026 Octl, Inc.</span>
+    <span>octl.ai</span>
+  </footer>
+</body>
+</html>
