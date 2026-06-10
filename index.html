@@ -6,25 +6,25 @@
   <title>octl — AI-native productivity</title>
   <meta name="description" content="octl (pronounced &quot;octal&quot;) — AI-native productivity for individuals and teams." />
   <meta name="color-scheme" content="dark" />
-  <meta name="theme-color" content="#060605" />
+  <meta name="theme-color" content="#04070d" />
   <meta property="og:title" content="octl — AI-native productivity" />
   <meta property="og:description" content="AI-native productivity for individuals and teams." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://octl.ai/" />
   <meta property="og:site_name" content="octl" />
   <meta name="twitter:card" content="summary" />
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23060605'/%3E%3Ctext x='32' y='46' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='42' fill='%23e2a93f'%3Eo%3C/text%3E%3C/svg%3E" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2304070d'/%3E%3Ctext x='32' y='46' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='42' fill='%236fe0cf'%3Eo%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Martian+Mono:wght@300;400&display=swap" />
   <style>
     :root {
-      --bg: #060605;
-      --ink: #f1ede4;
-      --ink-soft: #d9d4c8;
-      --muted: #8d8a80;
-      --line: #232118;
-      --accent: #e2a93f;
+      --bg: #04070d;
+      --ink: #e9eef4;
+      --ink-soft: #c4cedb;
+      --muted: #7e8b9d;
+      --line: #18202e;
+      --accent: #6fe0cf;
       --mx: 50vw;
       --my: 38vh;
       --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
@@ -39,6 +39,8 @@
       font-weight: 300;
       color: var(--ink);
       background: var(--bg);
+      background-image: linear-gradient(180deg, #0b1424 0%, #070d18 36%, #04070d 64%, #02040a 100%);
+      background-attachment: fixed;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       line-height: 1.5;
@@ -56,6 +58,18 @@
       inset: 0;
       z-index: 0;
       pointer-events: none;
+    }
+
+    /* Light from a surface far above */
+    .rays {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(99deg, transparent 26%, rgba(160, 200, 230, 0.028) 35%, transparent 44%),
+        linear-gradient(96deg, transparent 49%, rgba(160, 200, 230, 0.02) 57%, transparent 66%),
+        linear-gradient(103deg, transparent 69%, rgba(160, 200, 230, 0.024) 76%, transparent 83%);
+      -webkit-mask-image: linear-gradient(180deg, #000, transparent 62%);
+      mask-image: linear-gradient(180deg, #000, transparent 62%);
     }
 
     .arms {
@@ -76,19 +90,31 @@
 
     .arms circle { fill: currentColor; stroke: none; }
 
+    /* The eye — exists only inside the light */
+    .arms .eye path, .arms .eye circle { fill: none; stroke: currentColor; stroke-width: 1.6; }
+    .arms .eye .pupil { fill: currentColor; stroke: none; }
+
+    /* Marine snow, drifting */
+    .arms-motes { opacity: 0.14; }
+    .motes { animation: drift 18s ease-in-out infinite alternate; }
+
+    @keyframes drift {
+      to { transform: translateY(-18px); }
+    }
+
     /* Lit copy of the arms — only visible inside the lantern's pool */
     .arms-lit {
       color: var(--accent);
       opacity: 0.55;
-      -webkit-mask-image: radial-gradient(circle 430px at var(--mx) var(--my), #000 0%, transparent 100%);
-      mask-image: radial-gradient(circle 430px at var(--mx) var(--my), #000 0%, transparent 100%);
+      -webkit-mask-image: radial-gradient(circle 470px at var(--mx) var(--my), #000 0%, transparent 100%);
+      mask-image: radial-gradient(circle 470px at var(--mx) var(--my), #000 0%, transparent 100%);
     }
 
     /* Warm pool of light that follows the pointer */
     .glow {
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle 540px at var(--mx) var(--my), rgba(236, 196, 120, 0.13), transparent 70%);
+      background: radial-gradient(circle 540px at var(--mx) var(--my), rgba(122, 219, 205, 0.11), transparent 70%);
       mix-blend-mode: screen;
     }
 
@@ -106,6 +132,9 @@
     .arms-base path:nth-of-type(6) { animation-delay: 900ms; }
     .arms-base path:nth-of-type(7) { animation-delay: 1020ms; }
     .arms-base path:nth-of-type(8) { animation-delay: 1140ms; }
+    .arms-base path:nth-of-type(9) { animation-delay: 1260ms; }
+    .arms-base path:nth-of-type(10) { animation-delay: 1380ms; }
+    .arms-base path:nth-of-type(11) { animation-delay: 1500ms; }
 
     @keyframes draw { to { stroke-dashoffset: 0; } }
 
@@ -268,14 +297,15 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .rise, .deep > *, .arms-base path { animation: none; }
+      .rise, .deep > *, .arms-base path, .motes { animation: none; }
       .arms-base path { stroke-dashoffset: 0; }
     }
   </style>
 </head>
 <body>
   <div class="deep" aria-hidden="true">
-    <svg class="arms arms-base" viewBox="0 0 1440 900" preserveAspectRatio="xMaxYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <div class="rays"></div>
+    <svg class="arms arms-base" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
       <g id="armset">
         <path pathLength="1" stroke-width="2.4" d="M 1430 930 C 1150 860 940 760 800 620 C 680 500 640 380 700 280 C 740 215 820 200 850 250 C 875 292 840 340 795 330 C 762 322 755 285 778 268" />
         <path pathLength="1" stroke-width="2" d="M 1460 760 C 1280 700 1140 630 1040 520 C 950 420 940 310 1020 250 C 1075 210 1140 235 1130 290 C 1122 332 1070 340 1052 305" />
@@ -285,15 +315,33 @@
         <path pathLength="1" stroke-width="1.3" d="M 1465 880 C 1340 830 1255 775 1205 700 C 1158 630 1170 555 1230 530 C 1272 512 1305 545 1288 575" />
         <path pathLength="1" stroke-width="1.1" d="M 1430 990 C 1330 930 1265 890 1215 845 C 1170 805 1150 760 1165 720" />
         <path pathLength="1" stroke-width="1" d="M 1475 700 C 1400 670 1345 635 1310 585 C 1280 542 1282 500 1310 480" />
+        <path pathLength="1" stroke-width="1.7" d="M -40 800 C 180 760 330 690 425 580 C 510 482 528 388 468 332 C 422 290 358 304 368 352 C 376 391 428 392 444 356" />
+        <path pathLength="1" stroke-width="1.2" d="M -50 920 C 170 895 340 880 490 838 C 612 804 668 742 656 678 C 647 630 600 615 580 650" />
+        <path pathLength="1" stroke-width="1" d="M 1460 380 C 1290 345 1140 312 1015 280 C 912 254 856 208 868 158 C 877 120 928 112 938 150 C 945 177 913 188 898 168" />
       </g>
     </svg>
-    <svg class="arms arms-lit" viewBox="0 0 1440 900" preserveAspectRatio="xMaxYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <svg class="arms arms-lit" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
       <use href="#armset" />
       <g class="suckers">
-        <circle cx="1245" cy="868" r="2.4" /><circle cx="1175" cy="842" r="2.2" />
-        <circle cx="1085" cy="800" r="2.2" /><circle cx="1005" cy="748" r="2" />
-        <circle cx="930" cy="688" r="2" /><circle cx="862" cy="618" r="1.8" />
-        <circle cx="1280" cy="582" r="1.8" /><circle cx="1262" cy="548" r="1.6" />
+        <circle cx="1240" cy="862" r="2.4" /><circle cx="1160" cy="832" r="2.2" />
+        <circle cx="1078" cy="792" r="2.2" /><circle cx="1000" cy="742" r="2" />
+        <circle cx="928" cy="684" r="2" /><circle cx="864" cy="622" r="1.8" />
+        <circle cx="1238" cy="678" r="2" /><circle cx="1150" cy="622" r="1.9" />
+        <circle cx="1078" cy="552" r="1.8" /><circle cx="1018" cy="468" r="1.6" />
+      </g>
+      <g class="eye">
+        <path d="M 230 705 Q 290 663 350 705 Q 290 749 230 705 Z" />
+        <circle cx="290" cy="705" r="23" />
+        <path class="pupil" d="M 271 701 h 38 a 5 5 0 0 1 0 9 h -38 a 5 5 0 0 1 0 -9 Z" />
+      </g>
+    </svg>
+    <svg class="arms arms-motes" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <g class="motes">
+        <circle cx="220" cy="640" r="1.4" /><circle cx="350" cy="300" r="1" />
+        <circle cx="540" cy="730" r="1.2" /><circle cx="660" cy="190" r="0.9" />
+        <circle cx="900" cy="760" r="1.4" /><circle cx="1040" cy="170" r="1" />
+        <circle cx="1130" cy="430" r="1.2" /><circle cx="1260" cy="240" r="0.9" />
+        <circle cx="1340" cy="660" r="1.3" /><circle cx="160" cy="180" r="1" />
       </g>
     </svg>
     <div class="glow"></div>
@@ -305,11 +353,11 @@
       <h1 class="wordmark rise" style="--d: 0.08s">octl</h1>
       <p class="ipa rise" style="--d: 0.16s"><span aria-hidden="true">/&#39;ɒktəl/</span><span class="ipa-sep" aria-hidden="true">·</span>pronounced &ldquo;octal&rdquo;</p>
 
-      <p class="statement rise" style="--d: 0.26s">AI-native productivity for individuals and&nbsp;teams.</p>
-      <p class="quiet rise" style="--d: 0.34s">We&rsquo;re building heads-down. More when it&rsquo;s ready.</p>
+      <p class="statement rise" style="--d: 0.26s">An octopus never feels&nbsp;understaffed.</p>
+      <p class="quiet rise" style="--d: 0.34s">Soon, neither will you. We&rsquo;re building in the&nbsp;deep.</p>
 
       <p class="names rise" style="--d: 0.5s">
-        <a href="https://www.linkedin.com/in/andrewhyi" target="_blank" rel="noopener" aria-label="Andrew Yi — LinkedIn">Andrew Yi</a><span class="dot" aria-hidden="true">·</span><a href="https://www.linkedin.com/in/ben" target="_blank" rel="noopener" aria-label="Ben Yi — LinkedIn">Ben Yi</a>
+        <a href="https://www.linkedin.com/in/andrewhyi" target="_blank" rel="noopener" aria-label="Andrew — LinkedIn">Andrew</a><span class="dot" aria-hidden="true">·</span><a href="https://www.linkedin.com/in/ben" target="_blank" rel="noopener" aria-label="Ben — LinkedIn">Ben</a>
       </p>
       <p class="mail rise" style="--d: 0.58s"><a href="mailto:hello@octl.ai">hello@octl.ai</a></p>
     </div>
