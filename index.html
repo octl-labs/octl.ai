@@ -216,7 +216,7 @@
       text-align: center; max-width: 680px;
     }
     .stack a { pointer-events: auto; }
-    .est, .wordmark, .ipa, .statement, .quiet, .names, .mail {
+    .est, .wordmark, .ipa, .statement, .quiet, .names, .mail, .feature {
       transition: color 450ms ease, text-shadow 450ms ease;
       text-shadow: var(--halo);
     }
@@ -250,6 +250,10 @@
     }
     .names .dot { color: var(--muted); margin: 0 14px; }
     .mail { font-size: 12.5px; letter-spacing: 0.05em; margin: 18px 0 0; }
+    .feature {
+      font-size: 9.5px; font-weight: 400; letter-spacing: 0.3em; text-indent: 0.3em;
+      text-transform: uppercase; color: var(--muted); margin: 34px 0 0;
+    }
 
     /* ================================================================
        5 · HUD — depth meter, zone, rail, copyright, dive cue
@@ -1324,6 +1328,7 @@
         <a href="https://www.linkedin.com/in/andrewhyi" target="_blank" rel="noopener" aria-label="Andrew — LinkedIn">Andrew</a><span class="dot" aria-hidden="true">·</span><a href="https://www.linkedin.com/in/ben" target="_blank" rel="noopener" aria-label="Ben — LinkedIn">Ben</a>
       </p>
       <p class="mail rise" style="--d: 0.58s"><a href="mailto:hello@octl.ai">hello@octl.ai</a></p>
+      <p class="feature rise" style="--d: 0.66s"><a href="creature-feature.html">creature feature</a></p>
     </div>
   </main>
 

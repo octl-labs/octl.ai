@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>creature feature — octl</title>
+  <meta name="description" content="Every resident of the octl dive, 0 → 10,935 m, animated." />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#04070d" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2304070d'/%3E%3Ctext x='32' y='46' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='42' fill='%236fe0cf'%3Eo%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Martian+Mono:wght@300;400&display=swap" />
+  <style>
+    /* ================================================================
+       CREATURE FEATURE — the bestiary.
+       This page renders every resident straight out of index.html:
+       it fetches the dive, lifts the live sprite <defs> and the
+       CREATURES manifest, and lays them out as animated specimen
+       cards. One source of truth — art iterations on the dive show
+       up here automatically. Each card carries its sprite tag
+       (c-shark, c-angler…) so a single creature can be pinpointed
+       for feedback.
+       ============================================================== */
+    :root {
+      --bg: #04070d;
+      --ink: #e9eef4;
+      --muted: #7e8b9d;
+      --accent: #6fe0cf;
+      --line: #18202e;
+      --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+      --mono: 'Martian Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    html { scrollbar-width: none; }
+    ::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+    body {
+      font-family: var(--mono); font-weight: 300;
+      color: var(--ink); background: var(--bg);
+      background-image: linear-gradient(180deg, #0a1422 0%, #04070d 26rem);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.5;
+    }
+    ::selection { background: var(--accent); color: var(--bg); }
+
+    /* grain, same as the dive */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 7; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      opacity: 0.4;
+      mix-blend-mode: overlay;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    header { max-width: 1180px; margin: 0 auto; padding: 56px 24px 8px; }
+    .back {
+      font-size: 10px; font-weight: 400; letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--muted); transition: color 250ms ease;
+    }
+    .back:hover { color: var(--accent); }
+    h1 {
+      font-family: var(--serif); font-optical-sizing: auto; font-weight: 380;
+      font-size: clamp(2.8rem, 6.5vw, 4.4rem); letter-spacing: -0.01em; line-height: 1;
+      margin: 0.35em 0 0.3em;
+    }
+    .lede { font-size: 10.5px; letter-spacing: 0.18em; color: var(--muted); margin: 0; }
+    .lede .dot { margin: 0 8px; color: var(--line); }
+
+    main { max-width: 1180px; margin: 0 auto; padding: 8px 24px 110px; }
+
+    .zone-head { display: flex; align-items: baseline; gap: 16px; margin: 58px 0 18px; }
+    .zone-head h2 {
+      font-size: 10px; font-weight: 400; letter-spacing: 0.34em; text-transform: uppercase;
+      color: var(--muted); margin: 0; white-space: nowrap;
+    }
+    .zone-head .zline { flex: 1; height: 1px; background: linear-gradient(90deg, rgba(159,177,189,0.25), transparent); }
+    .zone-head .range { font-size: 9px; letter-spacing: 0.18em; color: #55657a; white-space: nowrap; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(232px, 1fr)); gap: 16px; }
+
+    .card {
+      position: relative; aspect-ratio: 5 / 4; border-radius: 16px;
+      border: 1px solid rgba(159, 177, 189, 0.1);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+      opacity: 0; translate: 0 16px;
+      transition: opacity 700ms ease, translate 700ms ease, border-color 300ms ease;
+    }
+    .card.in { opacity: 1; translate: 0 0; }
+    .card:hover { border-color: rgba(111, 224, 207, 0.4); }
+
+    .card .art { width: 70%; height: 62%; color: #d7e4ea; transition: color 350ms ease; }
+    .card:hover .art { color: var(--accent); }
+    .card .art svg {
+      display: block; width: 100%; height: 100%; overflow: visible;
+      fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round;
+    }
+
+    .meta {
+      position: absolute; left: 14px; right: 12px; bottom: 11px;
+      display: flex; justify-content: space-between; align-items: flex-end; gap: 10px;
+      pointer-events: none;
+    }
+    .meta .nm { font-size: 9.5px; letter-spacing: 0.16em; color: #b9c6d2; line-height: 1.6; }
+    .meta .nm small { display: block; font-size: 8.5px; color: var(--muted); letter-spacing: 0.14em; }
+    .meta .tag {
+      font-size: 8.5px; letter-spacing: 0.08em; color: var(--muted);
+      border: 1px solid rgba(159, 177, 189, 0.2); border-radius: 6px;
+      padding: 3px 7px; background: rgba(2, 8, 14, 0.4);
+      transition: color 300ms ease, border-color 300ms ease;
+    }
+    .card:hover .tag { color: var(--accent); border-color: rgba(111, 224, 207, 0.45); }
+
+    .card.wide { grid-column: 1 / -1; aspect-ratio: auto; min-height: 320px; }
+    .card.wide .art { width: min(86%, 900px); height: 78%; }
+    .card.sub-card .art { width: 46%; height: 58%; color: #cfdbe6; --beam-o: 1; }
+
+    /* ---- sprite layer semantics, mirrored from the dive ------------- */
+    .v-glow { fill: var(--accent); stroke: none; animation: glowpulse 3.6s ease-in-out infinite; animation-play-state: paused; }
+    .v-halo, .v-shade, .v-light { stroke: none; }
+    .pupil { stroke: none; }
+    .p-lamp { fill: #ffe9c4; stroke: none; }
+    .p-glass { fill: rgba(232, 177, 130, 0.75); }
+    .bub circle { fill: rgba(213, 235, 240, 0.5); stroke: none; }
+    .bub { animation: bub-rise 3.2s ease-in infinite; animation-play-state: paused; }
+    .prop { animation: prop-spin 1.6s linear infinite; transform-origin: 14px 50px; transform-box: view-box; animation-play-state: paused; }
+
+    /* ambient loops — run only while the card is on screen */
+    [data-anim] { animation-play-state: paused; }
+    [data-anim="drift"] { animation: v-drift 8s ease-in-out infinite alternate; }
+    [data-anim="swim"]  { animation: v-swim 9s ease-in-out infinite alternate; }
+    [data-anim="pulse"] { animation: v-pulse 4.6s ease-in-out infinite alternate; transform-origin: 50% 18%; }
+    [data-anim="sway"]  { animation: v-sway 7s ease-in-out infinite alternate; transform-origin: 50% 100%; }
+    [data-anim="hover"] { animation: v-hover 11s ease-in-out infinite alternate; }
+    [data-anim="writhe"] { animation: v-writhe 10s ease-in-out infinite alternate; transform-origin: 50% 100%; }
+    .card.live [data-anim], .card.live .v-glow, .card.live .bub, .card.live .prop { animation-play-state: running; }
+
+    @keyframes glowpulse { 50% { opacity: 0.3; } }
+    @keyframes v-drift { from { transform: translateY(-7px); }  to { transform: translateY(8px); } }
+    @keyframes v-swim  { from { transform: translate(-10px, -4px) rotate(-1.5deg); } to { transform: translate(9px, 5px) rotate(1.2deg); } }
+    @keyframes v-pulse { from { transform: scale(1, 0.97); } to { transform: scale(0.985, 1.05) translateY(-8px); } }
+    @keyframes v-sway  { from { transform: rotate(-2.4deg); } to { transform: rotate(2.2deg); } }
+    @keyframes v-hover { from { transform: translate(-7px, -8px) rotate(1deg); } to { transform: translate(7px, 7px) rotate(-1.6deg); } }
+    @keyframes v-writhe { from { transform: rotate(-1deg); } to { transform: rotate(1.2deg); } }
+    @keyframes prop-spin { to { transform: rotate(360deg); } }
+    @keyframes bub-rise {
+      from { transform: translate(0, 0); opacity: 0; }
+      18%  { opacity: 1; }
+      to   { transform: translate(-26px, -54px); opacity: 0; }
+    }
+
+    .fine {
+      margin: 70px 0 0; text-align: center;
+      font-size: 9px; letter-spacing: 0.26em; text-transform: uppercase; color: #55657a;
+    }
+    .fine a { color: var(--muted); text-decoration: underline; text-decoration-color: rgba(159,177,189,0.3); text-underline-offset: 4px; }
+    .fine a:hover { color: var(--accent); }
+
+    .fail { font-size: 11px; color: var(--muted); letter-spacing: 0.08em; padding: 40px 0; }
+
+    @media (max-width: 640px) {
+      header { padding-top: 40px; }
+      .grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+      .card { border-radius: 12px; }
+      .meta { left: 10px; right: 8px; bottom: 8px; }
+      .meta .nm { font-size: 8.5px; }
+      .meta .tag { display: none; }
+      .card.wide .art { width: 96%; }
+    }
+    @media (max-width: 768px) {
+      body::before { mix-blend-mode: normal; opacity: 0.2; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      [data-anim], .v-glow, .bub, .prop { animation: none !important; }
+      .card { opacity: 1; translate: 0 0; transition: border-color 300ms ease; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="back" href="index.html">← return to the dive</a>
+    <h1>creature feature</h1>
+    <p class="lede">every resident of the water column<span class="dot">·</span>0 → 10,935 m<span class="dot">·</span>hover a specimen to shine the lantern on it</p>
+  </header>
+
+  <main id="mount"><noscript><p class="fail">the bestiary needs javascript to lift the creatures out of the dive.</p></noscript></main>
+
+  <script>
+    (async function () {
+      'use strict';
+      var mount = document.getElementById('mount');
+
+      function fail(msg) {
+        mount.innerHTML = '<p class="fail">could not open the bestiary — ' + msg + '</p>';
+      }
+
+      try {
+        /* lift the live sprites + manifest straight out of the dive,
+           so this page never drifts from the real art */
+        var res = await fetch('index.html', { cache: 'no-cache' });
+        if (!res.ok) throw new Error('fetch ' + res.status);
+        var html = await res.text();
+        var doc = new DOMParser().parseFromString(html, 'text/html');
+
+        function grabArray(name) {
+          var m = html.match(new RegExp('var ' + name + ' = (\\[[\\s\\S]*?\\n      \\]);'));
+          if (!m) throw new Error(name + ' not found in the dive');
+          return new Function('return ' + m[1])();
+        }
+        var CREATURES = grabArray('CREATURES');
+        var ZONES = grabArray('ZONES');
+
+        /* adopt the dive's sprite <defs> so nested <use> references
+           (school, pod, jellies, krill) resolve in THIS document */
+        var sprite = doc.querySelector('body > svg');
+        if (sprite) document.body.insertAdjacentHTML('afterbegin', sprite.outerHTML);
+
+        function symbolOf(id) { return doc.getElementById(id); }
+        function zoneOf(d) {
+          for (var i = ZONES.length - 1; i >= 0; i--) {
+            if (d >= ZONES[i].d0 && d <= ZONES[i].d1 && ZONES[i].d1 > ZONES[i].d0) return ZONES[i];
+          }
+          return ZONES[ZONES.length - 1];
+        }
+        var ZONE_BG = {
+          sunlight: 'linear-gradient(180deg, #15707f, #0b4a60)',
+          twilight: 'linear-gradient(180deg, #093350, #051d33)',
+          midnight: 'linear-gradient(180deg, #020a13, #01040a)',
+          abyss:    'linear-gradient(180deg, #010407, #000)',
+          hadal:    'linear-gradient(180deg, #000204, #000)',
+          lair:     'linear-gradient(180deg, #000, #000)'
+        };
+        function fmt(m) { return m.toLocaleString('en-US'); }
+
+        function card(opts) {
+          var el = document.createElement('div');
+          el.className = 'card' + (opts.cls ? ' ' + opts.cls : '');
+          el.style.background = opts.bg;
+          el.innerHTML =
+            '<div class="art"' + (opts.anim ? ' data-anim="' + opts.anim + '"' : '') + '>'
+            + '<svg viewBox="' + opts.viewBox + '" xmlns="http://www.w3.org/2000/svg">' + opts.inner + '</svg></div>'
+            + '<div class="meta"><div class="nm">' + opts.name
+            + (opts.depthLabel ? '<small>' + opts.depthLabel + '</small>' : '') + '</div>'
+            + '<div class="tag">' + opts.tag + '</div></div>';
+          return el;
+        }
+
+        var frag = document.createDocumentFragment();
+
+        /* —— the vessel, first —— */
+        var subSvg = doc.querySelector('#sub svg');
+        if (subSvg) {
+          var head = document.createElement('div');
+          head.className = 'zone-head';
+          head.innerHTML = '<h2>the vessel</h2><div class="zline"></div><span class="range">crew of you</span>';
+          frag.appendChild(head);
+          var g0 = document.createElement('div');
+          g0.className = 'grid';
+          g0.appendChild(card({
+            cls: 'sub-card', bg: ZONE_BG.twilight,
+            viewBox: subSvg.getAttribute('viewBox'), inner: subSvg.innerHTML,
+            anim: 'drift', name: 'the submersible', depthLabel: '0 → 10,935 m, reluctantly', tag: '#sub'
+          }));
+          frag.appendChild(g0);
+        }
+
+        /* —— the residents, by zone —— */
+        var seenSym = {};
+        ZONES.forEach(function (z) {
+          var residents = CREATURES.filter(function (c) {
+            if (c.type || !c.sym) return false;          /* lines, marks, facts */
+            if (c.cap === '') return false;              /* mirrored duplicates */
+            if (seenSym[c.sym]) return false;
+            var cz = zoneOf(c.d);
+            return cz.id === z.id;
+          });
+          if (!residents.length) return;
+
+          var head = document.createElement('div');
+          head.className = 'zone-head';
+          head.innerHTML = '<h2>' + z.label + '</h2><div class="zline"></div><span class="range">'
+            + fmt(z.d0) + ' – ' + fmt(z.d1) + ' m</span>';
+          frag.appendChild(head);
+
+          var grid = document.createElement('div');
+          grid.className = 'grid';
+          residents.forEach(function (c) {
+            seenSym[c.sym] = true;
+            var sym = symbolOf(c.sym);
+            if (!sym) return;
+            var nm = c.name || (c.cap ? c.cap.split('\n')[0].split('—')[0].trim() : c.sym.slice(2));
+            if (c.sym === 'c-eye') nm = 'the eye below';
+            grid.appendChild(card({
+              bg: ZONE_BG[z.id] || ZONE_BG.hadal,
+              viewBox: sym.getAttribute('viewBox'), inner: sym.innerHTML,
+              anim: c.anim || null, name: nm,
+              depthLabel: '−' + fmt(c.d) + ' m · ' + z.label, tag: c.sym
+            }));
+          });
+          frag.appendChild(grid);
+        });
+
+        /* —— and the thing at the bottom —— */
+        var arms = symbolOf('c-arms');
+        if (arms) {
+          var head2 = document.createElement('div');
+          head2.className = 'zone-head';
+          head2.innerHTML = '<h2>the kraken</h2><div class="zline"></div><span class="range">10,935 m · do not linger</span>';
+          frag.appendChild(head2);
+          var g2 = document.createElement('div');
+          g2.className = 'grid';
+          g2.appendChild(card({
+            cls: 'wide', bg: ZONE_BG.lair,
+            viewBox: arms.getAttribute('viewBox'), inner: arms.innerHTML,
+            anim: 'writhe', name: 'it is patient', depthLabel: 'challenger deep', tag: 'c-arms'
+          }));
+          frag.appendChild(g2);
+        }
+
+        var fine = document.createElement('p');
+        fine.className = 'fine';
+        fine.innerHTML = 'each tag names a sprite in the dive — point at one and it can be redrawn alone · <a href="index.html">dive back in</a>';
+        frag.appendChild(fine);
+
+        mount.appendChild(frag);
+
+        /* entrance + run loops only while a card is on screen */
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            e.target.classList.toggle('live', e.isIntersecting);
+            if (e.isIntersecting) e.target.classList.add('in');
+          });
+        }, { rootMargin: '80px 0px' });
+        document.querySelectorAll('.card').forEach(function (c, i) {
+          c.style.transitionDelay = (Math.min(i % 8, 6) * 60) + 'ms';
+          io.observe(c);
+        });
+      } catch (e) {
+        fail(e.message);
+      }
+    })();
+  </script>
+</body>
+</html>
