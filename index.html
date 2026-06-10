@@ -20,13 +20,14 @@
   <style>
     /* ================================================================
        1 · TOKENS & INK THEMES
-       The dive: 42.5 viewport-screens from a dawn sky to 10,935 m.
-       World-space art lives in #world and scrolls natively; everything
-       dynamic that is not world-locked is fixed and driven by CSS vars
-       written from a single rAF tick.
+       The dive: 40.85 viewport-screens from the dawn surface to 10,935 m.
+       The opening frame IS the surface: waterline at 35lvh, ships riding
+       it, the sub bobbing just beneath. World-space art lives in #world
+       and scrolls natively; everything dynamic that is not world-locked
+       is fixed and driven by CSS vars written from a single rAF tick.
        ============================================================== */
     :root {
-      --total-screens: 42.5;        /* must equal the JS ZONES weight sum */
+      --total-screens: 40.85;       /* must equal the JS ZONES weight sum */
       --bg: #04070d;
       --accent: #6fe0cf;
       --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
@@ -83,7 +84,7 @@
        2 · THE WORLD — tall scrolling document + painted-once gradient
        Gradient stop positions are fractions of total screens, so they
        are resolution-independent and live in plain CSS. The waterline
-       (depth 0 at viewport center) sits at exactly 200lvh.
+       (depth 0) sits at exactly 35lvh.
        ============================================================== */
     #world {
       position: relative;
@@ -96,54 +97,59 @@
     .bg-gradient {
       position: absolute; inset: 0;
       background-image: linear-gradient(180deg,
-        #f6e1ca 0%,  #f6e1ca 1.18%, #f2d3ae 3.29%, #eab987 4.26%, #de9d6b 4.705%,
-        #2f9aa6 4.706%, #1e8493 5.53%, #136075 7.35%, #0c4661 10.29%,
-        #082e4b 16.47%, #051c33 20.35%, #030f1d 25.29%, #020711 30.59%,
-        #010308 34.51%, #000000 40.78%, #000000 100%);
+        #f6e1ca 0%, #f2d3ae 0.4406%, #eab987 0.8078%, #de9d6b 0.8567%,
+        #2f9aa6 0.8568%, #1e8493 1.714%, #136075 3.608%, #0c4661 6.666%,
+        #082e4b 13.096%, #051c33 17.133%, #030f1d 22.272%, #020711 27.784%,
+        #010308 31.865%, #000000 38.387%, #000000 100%);
     }
 
-    /* ---- dawn surface scene (world-locked) -------------------------- */
-    .scene-surface { position: absolute; top: 0; left: 0; width: 100%; height: 260lvh; }
+    /* ---- dawn surface scene (sky band lives in 0–28lvh) -------------- */
+    .scene-surface { position: absolute; top: 0; left: 0; width: 100%; height: 120lvh; }
     .scene-surface svg { position: absolute; overflow: visible; }
     .scene-surface path, .scene-surface circle, .scene-surface line {
       fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round;
     }
 
-    .sun { top: 16lvh; left: 67vw; width: clamp(96px, 13vw, 160px); height: auto; color: #c98a58; }
+    .sun { top: 3lvh; left: 70vw; width: clamp(72px, 9vw, 110px); height: auto; color: #c98a58; }
     .sun::before {
-      content: ''; position: absolute; inset: -60%;
+      content: ''; position: absolute; inset: -55%;
       background: radial-gradient(circle, rgba(232, 168, 110, 0.5), transparent 65%);
     }
     .sun .disc { fill: #e8b182; fill-opacity: 0.55; stroke: none; }
 
-    .cloud { color: rgba(132, 96, 72, 0.55); width: clamp(150px, 22vw, 300px); height: auto; }
-    .cloud-1 { top: 12lvh; left: 10vw; }
-    .cloud-2 { top: 38lvh; left: 70vw; animation-delay: -9s; }
-    .cloud-3 { top: 50lvh; left: 28vw; width: clamp(110px, 15vw, 200px); opacity: 0.7; }
+    .cloud { color: rgba(132, 96, 72, 0.55); width: clamp(140px, 19vw, 260px); height: auto; }
+    .cloud-1 { top: 4lvh; left: 8vw; }
+    .cloud-2 { top: 12lvh; left: 56vw; animation-delay: -9s; }
+    .cloud-3 { top: 19lvh; left: 30vw; width: clamp(100px, 13vw, 170px); opacity: 0.7; }
     .cloud { animation: cloud-drift 36s ease-in-out infinite alternate; }
     @keyframes cloud-drift { to { transform: translateX(26px); } }
 
-    .gull { color: #58473a; width: 38px; height: auto; animation: gull-bob 5s ease-in-out infinite alternate; }
-    .gull-1 { top: 52lvh; left: 24vw; }
-    .gull-2 { top: 46lvh; left: 38vw; width: 26px; animation-delay: -2s; }
-    .gull-3 { top: 60lvh; left: 78vw; width: 30px; animation-delay: -3.5s; }
+    .gull { color: #58473a; width: 34px; height: auto; animation: gull-bob 5s ease-in-out infinite alternate; }
+    .gull-1 { top: 17lvh; left: 22vw; }
+    .gull-2 { top: 21lvh; left: 40vw; width: 24px; animation-delay: -2s; }
+    .gull-3 { top: 24lvh; left: 81vw; width: 28px; animation-delay: -3.5s; }
     @keyframes gull-bob { to { transform: translate(14px, -8px); } }
 
-    /* the waterline sits at 200lvh (depth 0 at viewport center) */
-    .waves { top: calc(200lvh - 13px); left: 0; width: 100%; height: 26px; overflow: hidden !important; color: rgba(255, 243, 224, 0.8); }
+    /* the waterline sits at 35lvh (depth 0) */
+    .waves { top: calc(35lvh - 13px); left: 0; width: 100%; height: 26px; overflow: hidden !important; color: rgba(255, 243, 224, 0.8); }
     .waves .train { animation: wave-run 13s linear infinite; }
     @keyframes wave-run { to { transform: translateX(-50%); } }
 
-    .boat { top: calc(200lvh - 78px); left: 14vw; width: 150px; height: auto; color: #41372c; transform-origin: 50% 100%; animation: boat-bob 7s ease-in-out infinite alternate; }
+    .boat { top: calc(35lvh - 78px); left: 11vw; width: 150px; height: auto; color: #41372c; transform-origin: 50% 100%; animation: boat-bob 7s ease-in-out infinite alternate; }
     @keyframes boat-bob { from { transform: translateY(0) rotate(-1deg); } to { transform: translateY(5px) rotate(1.4deg); } }
 
-    .buoy { top: calc(200lvh - 34px); left: 74vw; width: 26px; height: auto; color: #6b4434; transform-origin: 50% 100%; animation: buoy-tilt 4.5s ease-in-out infinite alternate; }
+    .ship { top: calc(35lvh - 50px); left: 75vw; width: clamp(150px, 15vw, 215px); height: auto; color: rgba(74, 60, 47, 0.75); transform-origin: 50% 100%; animation: ship-bob 10s ease-in-out infinite alternate; }
+    @keyframes ship-bob { from { transform: translateY(0); } to { transform: translateY(3px) rotate(0.4deg); } }
+
+    .buoy { top: calc(35lvh - 34px); left: 58vw; width: 26px; height: auto; color: #6b4434; transform-origin: 50% 100%; animation: buoy-tilt 4.5s ease-in-out infinite alternate; }
     .buoy .lamp { fill: #e8b182; stroke: none; }
     @keyframes buoy-tilt { from { transform: rotate(-7deg); } to { transform: translateY(4px) rotate(6deg); } }
 
     /* mount points for later passes */
     .v-layer { position: absolute; inset: 0; }
-    .scene-lair { position: absolute; bottom: 0; left: 0; width: 100%; height: 220lvh; }
+    /* overflow:hidden so the sunk arm bases can't extend scrollable
+       height past the world bottom (a dead-scroll zone the FSM fights) */
+    .scene-lair { position: absolute; bottom: 0; left: 0; width: 100%; height: 220lvh; overflow: hidden; }
 
     /* ================================================================
        3 · FIXED FX LAYERS — opacity-only, compositor-friendly
@@ -365,7 +371,7 @@
     }
 
     /* trench walls close in through the hadal zone */
-    .trench { position: absolute; top: calc(30.5 * 100lvh); height: calc(12 * 100lvh); width: 16vw; color: rgba(165, 200, 212, 0.13); }
+    .trench { position: absolute; top: calc(28.85 * 100lvh); height: calc(12 * 100lvh); width: 16vw; color: rgba(165, 200, 212, 0.13); }
     .trench svg { width: 100%; height: 100%; }
     .trench path { fill: rgba(10, 15, 19, 0.55); stroke: currentColor; stroke-width: 1.2; vector-effect: non-scaling-stroke; }
     .trench-l { left: 0; }
@@ -383,7 +389,9 @@
     #sub {
       position: fixed; left: 13vw; top: 23vh; z-index: 8; width: 150px;
       pointer-events: none; color: var(--ink);
-      translate: var(--shake-x) var(--shake-y);
+      /* --sub-dip parks the sub just under the waterline near the top of
+         the dive; it composes with the finale shake */
+      translate: var(--shake-x) calc(var(--shake-y) + var(--sub-dip, 0px));
       transition: color 450ms ease;
     }
     .sub-bob { animation: sub-bob 5.4s ease-in-out infinite alternate; }
@@ -516,7 +524,7 @@
       to   { opacity: 0;   transform: translate(-50%, -50%) scale(1.5); }
     }
     .surfaced-quip {
-      position: fixed; left: calc(13vw + 170px); top: calc(23vh + 10px); z-index: 10;
+      position: fixed; left: calc(13vw + 170px); top: calc(23vh + 10px + var(--sub-dip, 0px)); z-index: 10;
       font-family: var(--mono); font-size: 10px; font-weight: 400; letter-spacing: 0.18em;
       color: var(--muted); opacity: 0; transition: opacity 900ms ease; pointer-events: none;
       max-width: 30ch;
@@ -566,11 +574,12 @@
       #rail { right: 10px; height: 44vh; }
       .hud-copy { bottom: auto; top: 16px; left: 14px; letter-spacing: 0.14em; }
       .cue { bottom: 14px; font-size: 8px; letter-spacing: 0.16em; text-indent: 0.16em; left: 44%; }
-      .boat { width: 110px; top: calc(200lvh - 58px); }
+      .boat { width: 110px; top: calc(35lvh - 58px); }
+      .ship { top: calc(35lvh - 38px); }
       #sub { left: 6vw; top: 14vh; width: 104px; }
       .beam { left: 93px; top: 30px; width: 86vw; height: 300px; margin-top: -150px; }
       .t-wrap { left: calc(6vw - 34px); top: calc(14vh - 46px); width: 176px; height: 162px; }
-      .surfaced-quip { left: auto; right: 8vw; top: calc(14vh + 110px); }
+      .surfaced-quip { left: auto; right: 8vw; top: calc(14vh + 110px + var(--sub-dip, 0px)); }
       .t-left { width: 46vw; } .t-right { width: 42vw; }
       .v-fact { max-width: 24ch; }
       .v-mark { max-width: 26ch; }
@@ -963,7 +972,7 @@
     </defs>
   </svg>
 
-  <!-- ··· the world: scrolls natively, 42.5 screens deep ··· -->
+  <!-- ··· the world: scrolls natively, 40.85 screens deep ··· -->
   <div id="world" aria-hidden="true">
     <div class="world-inner">
       <div class="bg-gradient"></div>
@@ -1007,6 +1016,13 @@
         <svg class="buoy" viewBox="0 0 26 36" xmlns="http://www.w3.org/2000/svg">
           <path stroke-width="1.8" d="M 3 32 L 9 10 H 17 L 23 32" />
           <circle class="lamp" cx="13" cy="6" r="3" />
+        </svg>
+        <svg class="ship" viewBox="0 0 220 56" xmlns="http://www.w3.org/2000/svg">
+          <path fill="currentColor" fill-opacity="0.16" stroke-width="1.5" d="M 8 36 L 16 50 H 202 L 212 36 Z" />
+          <path stroke-width="1.1" d="M 40 36 V 27 H 94 V 36 M 102 36 V 23 H 138 V 36 M 146 36 V 29 H 160 V 36" />
+          <path stroke-width="1.3" d="M 168 36 V 14 H 188 V 36" />
+          <path stroke-width="0.9" d="M 171 19 H 185 M 171 24 H 185" />
+          <path stroke-width="1.1" d="M 24 36 V 26 M 20 26 H 28" />
         </svg>
         <svg class="waves" viewBox="0 0 1200 26" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
           <g class="train">
@@ -1177,8 +1193,8 @@
   <!-- ··· instruments ··· -->
   <div id="hud" aria-hidden="true">
     <div class="hud-depth rise" style="--d: 0.7s">
-      <div class="m" id="hud-m">0 m</div>
-      <div class="zone" id="hud-zone">the surface</div>
+      <div class="m" id="hud-m">−6 m</div>
+      <div class="zone" id="hud-zone">sunlight zone</div>
     </div>
     <div id="rail" class="rise" style="--d: 0.7s"><div class="dot" id="rail-dot"></div></div>
     <div class="hud-copy rise" style="--d: 0.7s">&copy; 2026 Octl Labs, Inc.</div>
@@ -1201,8 +1217,9 @@
 
       /* ============ CONFIG — single source of truth ============ */
       var ZONES = [
-        { id: 'sky',      label: 'the surface',    d0: -40,   d1: 0,     screens: 1.5, body: '#f2d8ba' },
-        { id: 'sunlight', label: 'sunlight zone',  d0: 0,     d1: 200,   screens: 5,   body: '#15707f' },
+        /* the dive starts at −6 m: the waterline paints at 0.35 screens,
+           35% sky in the opening frame. body = top-overscroll color. */
+        { id: 'sunlight', label: 'sunlight zone',  d0: 6,     d1: 200,   screens: 4.85, body: '#f2d8ba' },
         { id: 'twilight', label: 'twilight zone',  d0: 200,   d1: 1000,  screens: 6,   body: '#04182b' },
         { id: 'midnight', label: 'midnight zone',  d0: 1000,  d1: 4000,  screens: 10,  body: '#010306' },
         { id: 'abyss',    label: 'the abyss',      d0: 4000,  d1: 6000,  screens: 6,   body: '#000000' },
@@ -1234,6 +1251,7 @@
 
       /* ============ MAPPING — depth ⇄ scroll ============ */
       var vw = 0, vh = 0, worldH = 0, screenPx = 0, maxY = 0, railH = 0;
+      var waterlinePx = 0, cruiseTop = 0, subGap = 46;
       var world = document.getElementById('world');
 
       function measure() {
@@ -1248,6 +1266,11 @@
           ZONES[i].px1 = acc * screenPx;
         }
         railH = document.getElementById('rail').clientHeight;
+        /* surface-hugging sub: where the waterline lives, and where the
+           sub cruises once the dive is properly underway */
+        waterlinePx = 0.35 * screenPx;
+        cruiseTop = parseFloat(getComputedStyle(document.getElementById('sub')).top) || 0;
+        subGap = vw < 660 ? 26 : 46;
       }
 
       function zoneAt(y) {
@@ -1488,6 +1511,9 @@
         }
         setVar('--beam-o', curve(BEAMO, d));
         setVarU('--beam-r', curve(BEAMR, d), 'px', 2);
+        /* near the top, the sub rides just below the waterline instead of
+           hanging in the sky; it settles to cruise within ~0.2 screens */
+        setVarU('--sub-dip', Math.max(0, waterlinePx - y + subGap - cruiseTop), 'px', 0.5);
         if (FSM.s !== 'throw') windowPass(y); /* no churn during the flight */
 
         dotEl.style.transform = 'translateY(' + ((y + vh * 0.5) / worldH * railH).toFixed(1) + 'px)';
@@ -1515,9 +1541,11 @@
         setVarU('--beam-a', a, 'deg', 0.2);
       }
       function measureNose() {
+        /* subtract whatever dip is currently rendered: the beam anchor is
+           cruise-relative (the beam is invisible while the sub is dipped) */
         var r = lampEl.getBoundingClientRect();
         nose.x = r.left + r.width / 2;
-        nose.y = r.top + r.height / 2;
+        nose.y = r.top + r.height / 2 - (lastVars['--sub-dip'] || 0);
       }
 
       addEventListener('pointermove', function (e) {
@@ -1852,6 +1880,10 @@
       function buildTicks() {
         var old = railEl.querySelectorAll('.tick');
         for (var i = 0; i < old.length; i++) old[i].remove();
+        var surf = document.createElement('div'); /* the waterline */
+        surf.className = 'tick';
+        surf.style.top = (waterlinePx / worldH * 100).toFixed(2) + '%';
+        railEl.appendChild(surf);
         for (var i = 1; i < ZONES.length; i++) {
           var t = document.createElement('div');
           t.className = 'tick';
