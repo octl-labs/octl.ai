@@ -43,17 +43,22 @@
       --shake-x: 0px; --shake-y: 0px;
     }
     html.ink-day {
-      --ink: #1d2733; --ink-soft: #33414f; --muted: #6d5f4e;
+      --ink: #1d2733; --ink-soft: #2e3d4d; --muted: #50555a;
       --line: rgba(29, 39, 51, 0.3);
+      /* warm halo hugs the glyphs so type reads over art */
+      --halo: 0 0 14px rgba(244, 222, 196, 0.9), 0 1px 30px rgba(238, 210, 178, 0.55);
     }
     html.ink-night {
       --ink: #e9eef4; --ink-soft: #c4cedb; --muted: #7e8b9d;
       --line: #18202e;
+      --halo: 0 0 14px rgba(2, 8, 14, 0.95), 0 1px 30px rgba(2, 8, 14, 0.6);
     }
 
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; }
-    html { scrollbar-gutter: stable; }
+    /* the OS scrollbar is hidden — the depth rail is the scrollbar */
+    html { scrollbar-width: none; }
+    ::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
     body {
       font-family: var(--mono);
@@ -182,7 +187,7 @@
     #scrim {
       position: fixed; inset: 0; z-index: 6; pointer-events: none;
       opacity: var(--scrim-o);
-      background: radial-gradient(ellipse 58% 46% at 50% 50%, rgba(2, 9, 16, 0.6), transparent 72%);
+      background: radial-gradient(ellipse 58% 46% at 50% 50%, rgba(2, 9, 16, 0.72), transparent 72%);
       transition: opacity 600ms ease;
     }
 
@@ -209,7 +214,10 @@
       text-align: center; max-width: 680px;
     }
     .stack a { pointer-events: auto; }
-    .est, .wordmark, .ipa, .statement, .quiet, .names, .mail { transition: color 450ms ease; }
+    .est, .wordmark, .ipa, .statement, .quiet, .names, .mail {
+      transition: color 450ms ease, text-shadow 450ms ease;
+      text-shadow: var(--halo);
+    }
 
     .rise { animation: rise 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 0s); }
     @keyframes rise {
@@ -246,7 +254,7 @@
        ============================================================== */
     #hud { position: fixed; inset: 0; z-index: 10; pointer-events: none; translate: var(--shake-x) var(--shake-y); }
 
-    .hud-depth { position: absolute; top: 20px; right: 22px; text-align: right; }
+    .hud-depth { position: absolute; top: 20px; right: 22px; text-align: right; text-shadow: var(--halo); }
     .hud-depth .m {
       font-size: 13px; font-weight: 400; letter-spacing: 0.08em;
       color: var(--ink); font-variant-numeric: tabular-nums;
@@ -1307,7 +1315,7 @@
         { d: 27,   x: 0.77, type: 'fact', text: 'by ten meters down, the sea has swallowed every red.' },
         { d: 33,   x: 0.22, w: 215, sym: 'c-pod',        name: 'spinner dolphins',    anim: 'swim' },
         { d: 40,   type: 'line', text: '40 m — recreational scuba limit' },
-        { d: 62,   x: 0.72, w: 250, sym: 'c-manta',      name: 'manta ray',           anim: 'drift' },
+        { d: 62,   x: 0.76, w: 250, sym: 'c-manta',      name: 'manta ray',           anim: 'drift' },
         { d: 100,  x: 0.22, w: 150, sym: 'c-jellies',    name: 'moon jellies',        anim: 'pulse' },
         { d: 145,  x: 0.71, w: 250, sym: 'c-shark',      name: 'blue shark',          anim: 'swim', flip: true },
         { d: 200,  type: 'line', text: '200 m — twilight zone · only ~1% of sunlight makes it this far' },
@@ -1327,7 +1335,7 @@
         { d: 1000, type: 'line', text: '1,000 m — midnight zone · below this line, the sun has never been seen' },
 
         /* —— midnight zone 1,000–4,000 m —— */
-        { d: 1150, x: 0.27, w: 160, sym: 'c-angler',     name: 'anglerfish, fishing', anim: 'drift' },
+        { d: 1150, x: 0.24, w: 160, sym: 'c-angler',     name: 'anglerfish, fishing', anim: 'drift' },
         { d: 1280, x: 0.73, type: 'mark', text: '1,280 m — a leatherback turtle\nonce dove to here' },
         { d: 1600, x: 0.7,  w: 140, sym: 'c-fang',       name: 'fangtooth',           anim: 'swim' },
         { d: 1850, x: 0.26, w: 220, sym: 'c-gulper',     name: 'gulper eel',          anim: 'drift', flip: true },
@@ -1342,7 +1350,7 @@
         /* —— the abyss 4,000–6,000 m —— */
         { d: 4400, x: 0.72, w: 150, sym: 'c-tripod',     name: 'tripod fish, standing watch' },
         { d: 4800, x: 0.26, w: 150, sym: 'c-seapig',     name: 'sea pigs, grazing the plain' },
-        { d: 5200, x: 0.7,  type: 'fact', text: 'xenophyophores live here — single cells the size of a fist.' },
+        { d: 5200, x: 0.74, type: 'fact', text: 'xenophyophores live here — single cells the size of a fist.' },
         { d: 5600, x: 0.29, w: 190, sym: 'c-rattail',    name: 'rattail, patrolling',  anim: 'swim' },
         { d: 6000, type: 'line', text: '6,000 m — hadal zone · named for hades. only the trenches go deeper' },
 
