@@ -274,6 +274,177 @@
     .cue.gone { opacity: 0; }
 
     /* ================================================================
+       5b · VIGNETTES — creatures, record marks, zone lines, facts
+       Positioned by JS from the manifest in pure lvh, centered on the
+       depth where the HUD meter reads their depth. Loops are transform/
+       opacity only and run solely while .live (windowed by the tick).
+       ============================================================== */
+    .vignette { position: absolute; transform: translate(-50%, -50%); pointer-events: none; color: #d7e4ea; opacity: 0; transition: opacity 700ms ease; }
+    .vignette.seen { opacity: 1; }
+    .vignette .art { position: relative; }
+    /* fill/stroke live on the svg root and inherit, so they also reach
+       shapes inside nested <use> shadow trees (school, pod, jellies, krill) */
+    .vignette .art svg, .lit-v svg {
+      display: block; width: 100%; height: auto; overflow: visible;
+      fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .vignette.flip .art svg { transform: scaleX(-1); }
+
+    /* deep silhouettes: barely-there line work, full-strength glow dots */
+    .vignette.v-deep { color: rgba(170, 196, 208, 0.34); }
+    /* ghosts exist only inside the beam */
+    .vignette.v-ghost { color: rgba(170, 196, 208, 0.06); }
+    .vignette.v-ghost .pupil, .lit-v .pupil { fill: currentColor; stroke: none; }
+    .vignette .art .v-glow, .lit-v .v-glow {
+      fill: var(--accent); stroke: none;
+      animation: glowpulse 3.6s ease-in-out infinite;
+      animation-play-state: paused;
+    }
+    .vignette.live .art .v-glow { animation-play-state: running; }
+    @keyframes glowpulse { 50% { opacity: 0.3; } }
+
+    /* one-time dash-draw entrance when first windowed */
+    .vignette.seen .art :is(path, circle, ellipse, line, use):not(.v-glow) {
+      stroke-dasharray: 1; stroke-dashoffset: 1;
+      animation: draw 1600ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    .vignette.seen .art :is(path, circle, ellipse, line, use):nth-of-type(2) { animation-delay: 90ms; }
+    .vignette.seen .art :is(path, circle, ellipse, line, use):nth-of-type(3) { animation-delay: 180ms; }
+    .vignette.seen .art :is(path, circle, ellipse, line, use):nth-of-type(4) { animation-delay: 270ms; }
+    .vignette.seen .art :is(path, circle, ellipse, line, use):nth-of-type(5) { animation-delay: 360ms; }
+    .vignette.seen .art :is(path, circle, ellipse, line, use):nth-of-type(6) { animation-delay: 450ms; }
+    .vignette.seen .art :is(path, circle, ellipse, line, use):nth-of-type(n+7) { animation-delay: 540ms; }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+
+    /* ambient loops (paused unless .live; lit clones run the same loop,
+       phase-synced via the Web Animations API at mount) */
+    [data-anim] .art { animation-play-state: paused; }
+    .live[data-anim] .art { animation-play-state: running; }
+    [data-anim="drift"] .art { animation: v-drift 8s ease-in-out infinite alternate; }
+    [data-anim="swim"]  .art { animation: v-swim 9s ease-in-out infinite alternate; }
+    [data-anim="pulse"] .art { animation: v-pulse 4.6s ease-in-out infinite alternate; transform-origin: 50% 18%; }
+    [data-anim="sway"]  .art { animation: v-sway 7s ease-in-out infinite alternate; transform-origin: 50% 100%; }
+    [data-anim="hover"] .art { animation: v-hover 11s ease-in-out infinite alternate; }
+    @keyframes v-drift { from { transform: translateY(-9px); }  to { transform: translateY(10px); } }
+    @keyframes v-swim  { from { transform: translate(-16px, -5px) rotate(-1.5deg); } to { transform: translate(14px, 6px) rotate(1.2deg); } }
+    @keyframes v-pulse { from { transform: scale(1, 0.97); } to { transform: scale(0.985, 1.05) translateY(-12px); } }
+    @keyframes v-sway  { from { transform: rotate(-2.4deg); } to { transform: rotate(2.2deg); } }
+    @keyframes v-hover { from { transform: translate(-10px, -12px) rotate(1deg); } to { transform: translate(10px, 10px) rotate(-1.6deg); } }
+
+    .v-cap {
+      margin: 12px 0 0; text-align: center;
+      font-family: var(--mono); font-size: 9.5px; font-weight: 400;
+      letter-spacing: 0.22em; line-height: 1.9; color: #9fb1bd; white-space: pre-line;
+      /* captions size to their text, centered under the art, regardless
+         of how narrow the creature is */
+      width: max-content; max-width: min(36ch, 82vw);
+      position: relative; left: 50%; transform: translateX(-50%);
+    }
+    .v-deep .v-cap { color: #66798a; }
+
+    .v-mark { max-width: 34ch; }
+    .v-mark .v-cap { color: #8294a3; }
+    .v-mark .v-cap::before { content: '◦ '; color: var(--accent); }
+
+    .v-fact { max-width: 30ch; }
+    .v-fact .v-cap {
+      font-family: var(--serif); font-style: italic; font-weight: 360;
+      font-size: 15.5px; letter-spacing: 0.01em; line-height: 1.55;
+      text-transform: none; color: #aebdca;
+    }
+
+    .v-line { width: 100vw; max-width: none; }
+    .v-line .rule {
+      height: 1px;
+      background: linear-gradient(90deg, transparent 2%, rgba(159, 177, 189, 0.3) 16%, rgba(159, 177, 189, 0.3) 84%, transparent 98%);
+    }
+    .v-line .v-cap {
+      position: absolute; left: max(20vw, 200px); bottom: 10px; margin: 0;
+      transform: none; text-align: left; color: #8294a3; max-width: min(60ch, 72vw);
+    }
+
+    /* trench walls close in through the hadal zone */
+    .trench { position: absolute; top: calc(30.5 * 100lvh); height: calc(12 * 100lvh); width: 16vw; color: rgba(165, 200, 212, 0.13); }
+    .trench svg { width: 100%; height: 100%; }
+    .trench path { fill: rgba(10, 15, 19, 0.55); stroke: currentColor; stroke-width: 1.2; vector-effect: non-scaling-stroke; }
+    .trench-l { left: 0; }
+    .trench-r { right: 0; transform: scaleX(-1); }
+
+    /* ================================================================
+       5c · THE SUBMARINE & ITS LIGHT
+       The sub is fixed; the world sinks past it. Its beam is the
+       lantern: a fixed, viewport-sized masked stage (#lit-stage)
+       reveals teal-lit clones of nearby creatures. The clone track
+       counter-scrolls on the compositor via scroll-timeline where
+       supported (rAF fallback otherwise) so base and lit copies can
+       never misalign.
+       ============================================================== */
+    #sub {
+      position: fixed; left: 13vw; top: 23vh; z-index: 8; width: 150px;
+      pointer-events: none; color: var(--ink);
+      translate: var(--shake-x) var(--shake-y);
+      transition: color 450ms ease;
+    }
+    .sub-bob { animation: sub-bob 5.4s ease-in-out infinite alternate; }
+    @keyframes sub-bob { from { transform: translateY(-4px); } to { transform: translateY(5px); } }
+    .sub-tilt { transform: rotate(var(--sub-tilt, 5deg)); transform-origin: 52% 50%; }
+    #sub svg { display: block; width: 100%; height: auto; overflow: visible; }
+    #sub path, #sub circle, #sub line {
+      fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round;
+      vector-effect: non-scaling-stroke;
+    }
+    #sub .p-glass { fill: rgba(232, 177, 130, 0.75); stroke: currentColor; }
+    #sub .p-lamp { fill: #ffe9c4; stroke: none; opacity: calc(0.25 + 0.75 * var(--beam-o, 0)); }
+    .prop { animation: prop-spin 1.6s linear infinite; transform-origin: 14px 50px; transform-box: view-box; }
+    @keyframes prop-spin { to { transform: rotate(360deg); } }
+    .bub circle { fill: rgba(213, 235, 240, 0.5); stroke: none; }
+    .bub { animation: bub-rise 3.2s ease-in infinite; }
+    @keyframes bub-rise {
+      from { transform: translate(0, 0); opacity: 0; }
+      18%  { opacity: 1; }
+      to   { transform: translate(-26px, -54px); opacity: 0; }
+    }
+
+    .beam {
+      position: absolute; left: 134px; top: 44px;
+      width: min(74vw, 860px); height: 380px; margin-top: -190px;
+      transform: rotate(var(--beam-a)); transform-origin: 0 50%;
+      background: linear-gradient(90deg, rgba(111, 224, 207, 0.16), rgba(111, 224, 207, 0.05) 46%, transparent 80%);
+      clip-path: polygon(0 47%, 0 53%, 100% 100%, 100% 0%);
+      mix-blend-mode: screen;
+      opacity: var(--beam-o, 0);
+    }
+
+    #beam-pool {
+      position: fixed; inset: 0; z-index: 3; pointer-events: none;
+      background: radial-gradient(circle 540px at var(--bx) var(--by), rgba(122, 219, 205, 0.1), transparent 70%);
+      mix-blend-mode: screen;
+      opacity: var(--beam-o, 0);
+    }
+
+    #lit-stage {
+      position: fixed; inset: 0; z-index: 3; pointer-events: none;
+      color: var(--accent); opacity: var(--beam-o, 0);
+      -webkit-mask-image: radial-gradient(circle var(--beam-r) at var(--bx) var(--by), #000 0%, rgba(0, 0, 0, 0.7) 55%, transparent 100%);
+      mask-image: radial-gradient(circle var(--beam-r) at var(--bx) var(--by), #000 0%, rgba(0, 0, 0, 0.7) 55%, transparent 100%);
+    }
+    #lit-track { position: absolute; top: 0; left: 0; width: 100%; height: calc(var(--total-screens) * 100lvh); }
+    .lit-v { position: absolute; transform: translate(-50%, -50%); opacity: 0.8; }
+    .lit-v svg { display: block; width: 100%; height: auto; overflow: visible; }
+    .lit-v.flip svg { transform: scaleX(-1); }
+
+    @supports (animation-timeline: scroll()) {
+      #lit-track {
+        animation: counter-scroll linear both;
+        animation-timeline: scroll(root);
+      }
+      @keyframes counter-scroll {
+        from { transform: translate3d(0, 0, 0); }
+        to   { transform: translate3d(0, calc(-1 * (var(--total-screens) * 100lvh - 100vh)), 0); }
+      }
+    }
+
+    /* ================================================================
        6 · RESPONSIVE
        ============================================================== */
     @media (max-width: 640px) {
@@ -286,6 +457,12 @@
       .hud-copy { bottom: auto; top: 16px; left: 14px; letter-spacing: 0.14em; }
       .cue { bottom: 14px; }
       .boat { width: 110px; top: calc(200lvh - 58px); }
+      #sub { left: 6vw; top: 14vh; width: 104px; }
+      .beam { left: 93px; top: 30px; width: 86vw; height: 300px; margin-top: -150px; }
+      .v-fact { max-width: 24ch; }
+      .v-mark { max-width: 26ch; }
+      .v-line .v-cap { left: 6vw; }
+      .trench { width: 13vw; }
     }
     @media (max-width: 768px) {
       body::before { mix-blend-mode: normal; opacity: 0.22; }
@@ -295,13 +472,380 @@
        7 · REDUCED MOTION (consolidated)
        ============================================================== */
     @media (prefers-reduced-motion: reduce) {
-      .rise, .cloud, .gull, .boat, .buoy, .waves .train, #fx-snow .drift, .cue .arr {
+      .rise, .cloud, .gull, .boat, .buoy, .waves .train, #fx-snow .drift, .cue .arr,
+      .vignette .art, .vignette .art .v-glow, .sub-bob, .prop, .bub {
         animation: none;
+      }
+      .vignette { opacity: 1; transition: none; }
+      .vignette.seen .art :is(path, circle, ellipse, line, use):not(.v-glow) {
+        animation: none; stroke-dasharray: none; stroke-dashoffset: 0;
       }
     }
   </style>
 </head>
 <body>
+
+  <!-- ··· creature sprite — every resident of the water column ··· -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <symbol id="c-fish" viewBox="0 0 22 12">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 3 6 Q 8 2 14 6 Q 8 10 3 6 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 14 6 L 19 3 L 18 6 L 19 9 Z" />
+      </symbol>
+      <symbol id="c-school" viewBox="0 0 170 110">
+        <use href="#c-fish" x="6" y="10" width="22" height="12" />
+        <use href="#c-fish" x="42" y="2" width="19" height="10" />
+        <use href="#c-fish" x="78" y="14" width="22" height="12" />
+        <use href="#c-fish" x="116" y="6" width="17" height="9" />
+        <use href="#c-fish" x="24" y="38" width="20" height="11" />
+        <use href="#c-fish" x="62" y="44" width="22" height="12" />
+        <use href="#c-fish" x="102" y="36" width="19" height="10" />
+        <use href="#c-fish" x="140" y="42" width="22" height="12" />
+        <use href="#c-fish" x="12" y="68" width="17" height="9" />
+        <use href="#c-fish" x="50" y="76" width="22" height="12" />
+        <use href="#c-fish" x="92" y="70" width="20" height="11" />
+        <use href="#c-fish" x="130" y="80" width="17" height="9" />
+        <use href="#c-fish" x="70" y="96" width="19" height="10" />
+      </symbol>
+
+      <symbol id="c-turtle" viewBox="0 0 120 78">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.7" d="M 26 40 Q 26 18 54 14 Q 82 18 84 40 Q 82 54 54 57 Q 26 54 26 40 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 40 22 Q 54 18 68 22 M 33 32 H 77 M 36 45 Q 54 50 72 45" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 84 34 Q 92 30 96 25 M 84 44 Q 93 42 98 37" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 96 24 Q 103 18 110 24 Q 114 30 108 35 Q 100 38 96 32 Z" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="105" cy="27" r="1.2" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 70 52 Q 76 68 92 73 Q 79 62 77 51" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 36 52 Q 30 64 18 67 Q 30 58 32 50" />
+      </symbol>
+
+      <symbol id="c-kelp" viewBox="0 0 90 220">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.7" d="M 30 218 C 38 182 22 150 32 112 C 40 84 26 48 36 6" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 31 192 Q 12 186 6 168" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 30 152 Q 50 144 56 126" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 29 116 Q 10 108 6 90" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 32 78 Q 52 70 58 52" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 34 40 Q 16 32 12 14" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 62 218 C 68 192 58 168 66 140 C 72 118 62 96 68 72" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 64 188 Q 82 180 86 164" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 65 146 Q 48 138 44 122" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 67 102 Q 84 94 88 78" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="36" cy="8" r="2.6" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="68" cy="74" r="2.2" />
+      </symbol>
+
+      <symbol id="c-dolphin" viewBox="0 0 156 74">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.7" d="M 6 46 Q 28 16 74 16 Q 114 16 144 40 Q 134 50 112 52 Q 60 56 22 50 Q 10 48 6 46 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 70 16 Q 76 3 90 5 Q 79 9 77 17" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 142 42 Q 152 38 154 30 M 143 44 Q 152 50 156 58" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 56 50 Q 58 62 48 68 Q 53 58 51 51" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 128 36 Q 138 40 146 44" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" cx="118" cy="32" r="1.4" />
+      </symbol>
+      <symbol id="c-pod" viewBox="0 0 280 150">
+        <use href="#c-dolphin" x="0" y="0" width="156" height="74" />
+        <use href="#c-dolphin" x="124" y="46" width="125" height="59" />
+        <use href="#c-dolphin" x="40" y="86" width="100" height="47" />
+      </symbol>
+
+      <symbol id="c-manta" viewBox="0 0 184 78">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.7" d="M 6 40 Q 52 4 90 30 Q 128 4 178 40 Q 128 54 92 46 Q 54 56 6 40 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 82 32 Q 78 22 68 21 M 100 32 Q 104 22 114 21" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 92 47 Q 94 64 90 76" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="78" cy="29" r="1.2" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="104" cy="29" r="1.2" />
+      </symbol>
+
+      <symbol id="c-jelly" viewBox="0 0 60 72">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 8 27 Q 8 6 30 6 Q 52 6 52 27" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 8 27 Q 13 32 19 28 Q 24 33 30 29 Q 36 33 41 28 Q 47 32 52 27" />
+        <ellipse class="v-glow" style="fill:var(--accent)" cx="30" cy="17" rx="11" ry="4.5" opacity="0.6" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 17 31 Q 13 45 17 57" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 26 33 Q 24 49 28 63" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 36 33 Q 38 47 34 59" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 45 30 Q 48 43 44 53" />
+      </symbol>
+      <symbol id="c-jellies" viewBox="0 0 150 140">
+        <use href="#c-jelly" x="0" y="0" width="60" height="72" />
+        <use href="#c-jelly" x="78" y="30" width="46" height="55" />
+        <use href="#c-jelly" x="42" y="80" width="36" height="43" />
+      </symbol>
+
+      <symbol id="c-shark" viewBox="0 0 224 80">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.7" d="M 18 42 Q 70 22 134 24 Q 180 26 212 42 Q 178 52 132 50 Q 68 52 18 46 Q 14 44 18 42 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 16 43 Q 4 28 8 14 Q 16 32 24 40" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 17 46 Q 8 56 12 66 Q 18 54 24 48" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 96 25 Q 100 8 118 10 Q 104 14 104 24" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 122 49 Q 120 64 136 70 Q 130 58 134 50" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 158 32 Q 160 38 158 43 M 166 31 Q 168 37 166 43 M 174 31 Q 176 37 174 42" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 206 45 Q 196 49 186 48" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" cx="192" cy="36" r="1.5" />
+      </symbol>
+
+      <symbol id="c-krill1" viewBox="0 0 50 36">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 8 16 Q 18 8 28 13 Q 38 18 36 26" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" d="M 36 26 Q 34 31 29 32" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.8" d="M 13 18 Q 11 23 7 25 M 19 16 Q 18 22 14 25 M 25 15 Q 25 21 21 24 M 30 17 Q 31 23 27 26" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.8" d="M 8 16 Q 2 11 3 4 M 9 14 Q 5 8 8 2" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" cx="11" cy="13" r="1" />
+      </symbol>
+      <symbol id="c-krill" viewBox="0 0 160 110">
+        <use href="#c-krill1" x="0" y="8" width="50" height="36" />
+        <use href="#c-krill1" x="62" y="0" width="40" height="29" />
+        <use href="#c-krill1" x="112" y="16" width="46" height="33" />
+        <use href="#c-krill1" x="28" y="58" width="42" height="30" />
+        <use href="#c-krill1" x="84" y="52" width="50" height="36" />
+        <use href="#c-krill1" x="132" y="72" width="36" height="26" />
+      </symbol>
+
+      <symbol id="c-lanternfish" viewBox="0 0 110 46">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 10 24 Q 30 8 60 9 Q 86 10 100 22 Q 86 34 58 34 Q 28 35 10 24 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 10 24 L 3 16 M 10 24 L 3 31" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 52 9 Q 56 3 64 4 Q 58 7 58 10" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" cx="84" cy="20" r="4.6" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="85.5" cy="20" r="1.6" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="28" cy="30" r="1.3" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="38" cy="31.5" r="1.3" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="48" cy="32" r="1.3" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="58" cy="32" r="1.3" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="68" cy="30.5" r="1.3" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="77" cy="28" r="1.3" />
+      </symbol>
+
+      <symbol id="c-hatchet" viewBox="0 0 74 84">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 16 28 Q 20 10 38 9 Q 54 10 58 22 Q 64 30 58 40 Q 52 64 38 70 Q 26 66 22 48 Q 14 40 16 28 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 52 16 Q 58 12 60 6" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 38 70 Q 36 78 42 82" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" cx="42" cy="24" r="5" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="43.5" cy="23" r="1.7" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="28" cy="44" r="1.4" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="31" cy="52" r="1.4" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="34" cy="60" r="1.4" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="38" cy="66" r="1.4" />
+      </symbol>
+
+      <symbol id="c-siphon" viewBox="0 0 44 230">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 22 4 Q 14 30 24 56 Q 32 82 20 108 Q 12 134 24 160 Q 32 186 22 212 Q 18 222 24 228" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 15 16 Q 21 8 27 16 M 14 38 Q 20 30 26 38" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" d="M 22 66 Q 30 64 34 58 M 21 90 Q 13 88 9 82 M 22 122 Q 30 120 34 114 M 22 146 Q 14 144 10 138 M 23 174 Q 31 172 35 166 M 22 198 Q 14 196 10 190" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="22" cy="28" r="1.2" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="23" cy="62" r="1.2" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="20" cy="96" r="1.2" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="22" cy="130" r="1.2" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="24" cy="164" r="1.2" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="22" cy="196" r="1.2" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="23" cy="224" r="1.2" />
+      </symbol>
+
+      <symbol id="c-gsquid" viewBox="0 0 150 212">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 75 6 Q 90 32 92 70 Q 94 96 86 108 L 64 108 Q 56 96 58 70 Q 60 32 75 6 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 60 34 Q 66 12 75 8 Q 84 12 90 34" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 64 108 Q 58 122 62 130 M 86 108 Q 92 122 88 130" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" cx="67" cy="119" r="6.5" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="68.5" cy="119" r="2.4" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 58 130 Q 50 150 56 166" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 66 132 Q 62 154 68 170" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 84 132 Q 88 154 82 170" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 92 130 Q 100 150 94 166" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 75 132 Q 73 152 77 164" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 62 131 Q 52 172 58 200 Q 59 206 64 207" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 88 131 Q 98 174 90 202 Q 88 208 83 207" />
+        <ellipse pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="64" cy="206" rx="4" ry="2.4" />
+        <ellipse pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="84" cy="206" rx="4" ry="2.4" />
+      </symbol>
+
+      <symbol id="c-barreleye" viewBox="0 0 112 70">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 34 20 Q 62 10 86 20 Q 102 27 102 38 Q 102 50 84 56 Q 58 62 36 56 Q 20 50 20 38 Q 20 26 34 20 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" opacity="0.55" d="M 58 17 Q 82 6 100 24" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 70 24 V 14 M 79 24 V 14" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="70" cy="13" r="2.6" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="79" cy="13" r="2.6" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 20 38 L 8 28 M 20 40 L 8 48" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 56 58 Q 54 66 60 69" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="92" cy="34" r="1.6" />
+      </symbol>
+
+      <symbol id="c-vampire" viewBox="0 0 110 122">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 55 10 Q 88 26 92 64 Q 92 88 76 102" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 55 10 Q 22 26 18 64 Q 18 88 34 102" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 34 102 Q 44 92 55 99 Q 66 92 76 102" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 42 20 Q 30 8 20 12 Q 30 17 38 25" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 68 20 Q 80 8 90 12 Q 80 17 72 25" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" cx="42" cy="54" r="7" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="44" cy="53" r="2.6" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 44 104 Q 42 112 46 118 M 64 104 Q 66 112 62 118" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="55" cy="12" r="1.4" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="90" cy="60" r="1.2" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="20" cy="60" r="1.2" />
+      </symbol>
+
+      <symbol id="c-whale" viewBox="0 0 320 124">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.8" d="M 20 38 Q 12 58 18 78 Q 24 90 42 92 Q 92 96 152 86 Q 232 76 284 64 Q 296 61 300 58" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.8" d="M 20 38 Q 62 24 132 26 Q 222 28 270 44 Q 292 50 300 58" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 300 58 Q 312 44 308 32 Q 298 46 294 54" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 300 60 Q 314 70 308 84 Q 297 70 294 62" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 22 80 Q 52 84 80 78" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 112 80 Q 114 98 98 104 Q 106 90 104 82" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 30 34 Q 34 30 40 31" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" cx="86" cy="64" r="2" />
+      </symbol>
+
+      <symbol id="c-angler" viewBox="0 0 150 112">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 38 42 Q 60 18 96 26 Q 128 34 132 60 Q 130 86 100 94 Q 66 100 46 82 Q 30 66 38 42 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 38 44 Q 26 46 14 42 Q 20 52 34 54" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 40 72 Q 24 78 12 70 Q 24 90 50 86" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 18 44 L 22 53 L 28 46 L 33 55 L 39 49" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 18 71 L 24 63 L 30 72 L 36 64 L 42 72" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" cx="58" cy="44" r="4.4" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="59.5" cy="43" r="1.6" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 62 24 Q 56 6 38 9" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="37" cy="9" r="3.6" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 104 92 Q 110 102 122 104 Q 112 94 112 88" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 128 50 Q 138 46 142 38 M 130 64 Q 140 66 146 62" />
+      </symbol>
+
+      <symbol id="c-fang" viewBox="0 0 134 84">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 16 38 Q 28 12 62 14 Q 98 16 118 34 Q 124 42 118 50 Q 98 68 64 66 Q 36 64 24 54" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 16 38 Q 12 58 34 64 Q 50 68 62 64" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 16 40 Q 40 44 60 42" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 30 42 L 28 56 M 44 44 L 43 58" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 36 62 L 37 50 M 52 63 L 52 52" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" cx="78" cy="32" r="4.4" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="79" cy="31" r="1.5" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 118 42 L 130 34 M 118 44 L 130 52" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 84 64 Q 86 74 96 76 Q 88 66 90 62" />
+      </symbol>
+
+      <symbol id="c-gulper" viewBox="0 0 244 112">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 10 32 Q 60 8 116 26" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 10 36 Q 28 96 94 90 Q 122 86 126 60" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 116 26 Q 126 40 126 56" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 126 60 Q 168 52 196 58 Q 220 63 234 56" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 196 58 Q 214 70 234 62" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" cx="112" cy="30" r="1.8" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="236" cy="58" r="2.4" />
+      </symbol>
+
+      <symbol id="c-vent" viewBox="0 0 220 172">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 4 162 Q 60 156 110 160 Q 170 164 216 158" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 36 161 L 44 86 Q 52 72 60 86 L 70 161" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 122 162 L 128 112 Q 134 100 140 112 L 148 162" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" opacity="0.5" d="M 50 80 Q 44 60 52 42 Q 58 28 50 12" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" opacity="0.5" d="M 134 106 Q 130 88 138 72 Q 143 60 137 46" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 80 161 Q 82 138 78 126 M 88 162 Q 90 134 86 120 M 96 162 Q 97 140 94 130 M 104 162 Q 106 136 102 124" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="78" cy="124" r="2" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="86" cy="118" r="2" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="94" cy="128" r="2" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="102" cy="122" r="2" />
+        <ellipse pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" cx="178" cy="150" rx="9" ry="6" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" d="M 170 154 Q 162 158 158 164 M 186 154 Q 192 158 196 164 M 172 146 Q 164 142 162 136 M 184 146 Q 190 140 190 134" />
+      </symbol>
+
+      <symbol id="c-whalefall" viewBox="0 0 300 124">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 4 114 Q 80 108 160 112 Q 240 116 296 110" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 24 112 Q 18 92 34 84 Q 52 78 64 88 Q 70 96 66 112" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 30 104 Q 44 100 56 104" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 66 96 Q 150 84 252 102" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 96 93 Q 104 68 96 54 M 120 90 Q 130 64 122 48 M 146 89 Q 156 66 150 52 M 172 90 Q 182 70 176 58 M 198 93 Q 206 76 202 66" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 224 97 L 226 86 M 240 99 L 242 90 M 254 100 L 256 92" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" d="M 40 118 Q 52 122 62 118 Q 70 114 78 118" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.8" cx="110" cy="108" r="1" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.8" cx="170" cy="110" r="1" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.8" cx="220" cy="108" r="1" />
+      </symbol>
+
+      <symbol id="c-dumbo" viewBox="0 0 110 102">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 30 54 Q 30 18 55 16 Q 80 18 80 54 Q 80 74 55 78 Q 30 74 30 54 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 38 26 Q 22 12 12 20 Q 22 28 36 32" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 72 26 Q 88 12 98 20 Q 88 28 74 32" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" cx="46" cy="46" r="4" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="47" cy="45" r="1.4" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" cx="64" cy="46" r="4" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="65" cy="45" r="1.4" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 34 70 Q 42 82 50 74 Q 56 84 64 74 Q 70 82 78 70" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 42 80 Q 40 90 46 94 M 68 80 Q 70 90 64 94" />
+      </symbol>
+
+      <symbol id="c-titanic" viewBox="0 0 320 152">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 4 144 Q 90 138 180 142 Q 260 146 316 140" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.7" d="M 40 140 L 56 70" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.7" d="M 56 70 Q 130 76 208 92" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 208 92 L 202 104 L 212 112 L 204 122 L 214 132 L 210 140" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 58 64 Q 130 70 206 86" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 70 65 V 72 M 92 67 V 74 M 114 69 V 76 M 136 71 V 79 M 158 74 V 82 M 180 78 V 86" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 96 74 L 90 30 M 90 30 H 98" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" d="M 84 92 Q 82 102 86 108 M 124 98 Q 122 108 126 114 M 164 104 Q 162 114 166 120" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" cx="80" cy="110" r="1.1" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" cx="108" cy="114" r="1.1" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" cx="136" cy="118" r="1.1" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" cx="164" cy="124" r="1.1" />
+      </symbol>
+
+      <symbol id="c-tripod" viewBox="0 0 130 122">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 4 114 Q 60 108 126 114" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 44 52 Q 58 40 76 44 Q 90 48 94 56 Q 90 66 74 68 Q 56 68 48 62 Q 42 58 44 52 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 52 64 L 36 112 M 70 68 L 66 112 M 92 60 L 110 112" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 60 44 Q 58 28 64 18" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 94 56 L 104 50 M 94 58 L 104 62" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" cx="56" cy="54" r="1.6" />
+      </symbol>
+
+      <symbol id="c-seapig" viewBox="0 0 130 82">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 4 74 Q 64 68 126 74" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 28 56 Q 26 34 48 28 Q 74 22 96 32 Q 110 38 106 52 Q 100 64 76 66 Q 44 68 28 56 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 40 64 V 72 M 56 66 V 73 M 72 66 V 73 M 88 62 V 71" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 52 28 Q 52 20 56 17 M 70 25 Q 70 17 74 14" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 98 36 Q 106 30 110 32 M 100 44 Q 110 42 114 45" />
+      </symbol>
+
+      <symbol id="c-rattail" viewBox="0 0 240 92">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 18 40 Q 32 14 72 14 Q 102 16 112 34" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 18 40 Q 14 48 20 52 Q 32 60 50 58" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 112 34 Q 172 40 232 58" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 50 58 Q 124 66 230 62" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 84 16 L 82 6 M 100 22 L 102 12 M 116 30 L 120 21 M 134 35 L 138 26 M 152 40 L 156 31 M 170 44 L 174 36" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" cx="58" cy="34" r="7.5" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="60" cy="33" r="2.8" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 34 54 Q 34 60 30 64" />
+      </symbol>
+
+      <symbol id="c-snailfish" viewBox="0 0 170 80">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 20 36 Q 22 16 46 13 Q 68 12 78 24 Q 120 28 158 44" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 20 36 Q 20 50 32 54 Q 70 64 112 60 Q 140 56 158 46" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 84 26 Q 96 22 104 26 M 112 28 Q 124 26 132 32 M 138 34 Q 148 34 154 40" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 48 56 Q 58 64 70 62" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" cx="38" cy="28" r="2" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" d="M 24 42 Q 30 44 36 43" />
+      </symbol>
+
+      <symbol id="c-amphi" viewBox="0 0 122 84">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 20 42 Q 28 16 58 14 Q 88 16 96 38 Q 100 52 90 62" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 42 17 L 40 36 M 56 14 L 56 36 M 70 16 L 72 36 M 82 22 L 86 42" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" d="M 34 42 Q 32 52 26 56 M 44 44 Q 43 54 38 59 M 54 45 Q 54 55 49 60 M 64 45 Q 66 55 61 60 M 74 44 Q 77 53 73 58" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" d="M 22 38 Q 8 32 4 20 M 24 44 Q 10 46 4 40" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="27" cy="33" r="1.5" />
+      </symbol>
+
+      <symbol id="c-eye" viewBox="0 0 140 90">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 10 45 Q 70 3 130 45 Q 70 87 10 45 Z" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" cx="70" cy="45" r="23" />
+        <path class="pupil" style="fill:currentColor" d="M 51 40.5 h 38 a 5 5 0 0 1 0 9 h -38 a 5 5 0 0 1 0 -9 Z" />
+      </symbol>
+
+      <symbol id="c-arms" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.4" d="M 1430 930 C 1150 860 940 760 800 620 C 680 500 640 380 700 280 C 740 215 820 200 850 250 C 875 292 840 340 795 330 C 762 322 755 285 778 268" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2" d="M 1460 760 C 1280 700 1140 630 1040 520 C 950 420 940 310 1020 250 C 1075 210 1140 235 1130 290 C 1122 332 1070 340 1052 305" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.8" d="M 1380 950 C 1120 900 900 880 700 850 C 510 822 380 740 340 620 C 312 535 360 460 425 480 C 478 496 480 560 430 575" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 1470 620 C 1340 580 1250 510 1200 420 C 1150 330 1170 240 1250 205 C 1305 181 1355 220 1335 265 C 1318 302 1270 295 1262 260" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 1320 960 C 1100 940 940 950 790 960 C 640 970 520 940 470 880" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 1465 880 C 1340 830 1255 775 1205 700 C 1158 630 1170 555 1230 530 C 1272 512 1305 545 1288 575" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 1430 990 C 1330 930 1265 890 1215 845 C 1170 805 1150 760 1165 720" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 1475 700 C 1400 670 1345 635 1310 585 C 1280 542 1282 500 1310 480" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.7" d="M -40 800 C 180 760 330 690 425 580 C 510 482 528 388 468 332 C 422 290 358 304 368 352 C 376 391 428 392 444 356" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M -50 920 C 170 895 340 880 490 838 C 612 804 668 742 656 678 C 647 630 600 615 580 650" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 1460 380 C 1290 345 1140 312 1015 280 C 912 254 856 208 868 158 C 877 120 928 112 938 150 C 945 177 913 188 898 168" />
+      </symbol>
+    </defs>
+  </svg>
 
   <!-- ··· the world: scrolls natively, 42.5 screens deep ··· -->
   <div id="world" aria-hidden="true">
@@ -356,6 +900,18 @@
       </div>
 
       <div class="v-layer"><!-- creature vignettes mount here --></div>
+
+      <div class="trench trench-l">
+        <svg viewBox="0 0 100 1200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 0 0 L 26 0 L 34 70 L 22 140 L 40 230 L 28 320 L 52 430 L 38 540 L 60 660 L 46 780 L 70 900 L 58 1020 L 82 1130 L 74 1200 L 0 1200 Z" />
+        </svg>
+      </div>
+      <div class="trench trench-r">
+        <svg viewBox="0 0 100 1200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M 0 0 L 30 0 L 20 80 L 38 170 L 26 270 L 46 380 L 34 490 L 58 610 L 44 730 L 64 850 L 52 970 L 78 1090 L 68 1200 L 0 1200 Z" />
+        </svg>
+      </div>
+
       <div class="scene-lair"><!-- the kraken's lair — finale pass --></div>
     </div>
   </div>
@@ -384,7 +940,40 @@
       </g>
     </svg>
   </div>
+  <!-- ··· the beam's pool of light reveals what hides in the dark ··· -->
+  <div id="lit-stage" aria-hidden="true"><div id="lit-track"></div></div>
+  <div id="beam-pool" aria-hidden="true"></div>
+
   <div id="scrim" aria-hidden="true"></div>
+
+  <!-- ··· the submarine ··· -->
+  <div id="sub" aria-hidden="true">
+    <div class="sub-bob"><div class="sub-tilt">
+      <div class="beam"></div>
+      <svg viewBox="0 0 170 100" xmlns="http://www.w3.org/2000/svg">
+        <g class="bub">
+          <circle cx="10" cy="42" r="2.2" />
+          <circle cx="4" cy="50" r="1.5" />
+          <circle cx="12" cy="56" r="1.1" />
+        </g>
+        <path stroke-width="1.8" d="M 22 56 Q 20 36 48 30 L 112 28 Q 142 30 150 48 Q 152 58 144 64 Q 120 76 70 74 Q 30 72 22 56 Z" />
+        <path stroke-width="1.5" d="M 62 30 V 16 Q 62 12 67 12 H 88 Q 92 12 92 16 V 28" />
+        <path stroke-width="1.3" d="M 76 12 V 4 H 84" />
+        <circle class="p-glass" stroke-width="1.4" cx="98" cy="50" r="9" />
+        <circle class="p-lamp" cx="151" cy="50" r="5.5" />
+        <path stroke-width="1.4" d="M 146 42 Q 154 44 156 50 Q 154 56 146 58" />
+        <path stroke-width="1.4" d="M 32 34 Q 24 22 36 18 L 46 29" />
+        <g class="prop">
+          <path stroke-width="1.4" d="M 14 50 Q 6 42 10 36 Q 16 44 16 49" />
+          <path stroke-width="1.4" d="M 14 51 Q 4 53 2 60 Q 11 56 14 53" />
+          <path stroke-width="1.4" d="M 15 49 Q 20 41 28 41 Q 21 46 18 50" />
+          <circle stroke-width="1.4" cx="14" cy="50" r="2.4" />
+        </g>
+        <path stroke-width="1.3" d="M 54 75 L 50 86 M 108 74 L 112 85 M 44 88 H 118" />
+        <path stroke-width="1" d="M 36 44 H 56 M 36 52 H 52" />
+      </svg>
+    </div></div>
+  </div>
 
   <!-- ··· the brand, unmoved by any of it ··· -->
   <main>
@@ -439,6 +1028,8 @@
       var FOG      = [[-40, 0], [0, 0], [150, 0.12], [400, 0.36], [900, 0.55], [1500, 0.66], [10935, 0.72]];
       var SNOW     = [[80, 0], [260, 0.16], [600, 0.24], [10935, 0.24]];
       var SCRIM    = [[-40, 0], [1, 0], [10, 0.32], [40, 0.44], [10935, 0.48]];
+      var BEAMO    = [[25, 0], [70, 0.55], [160, 1], [10935, 1]];
+      var BEAMR    = [[0, 300], [400, 440], [1200, 500], [10935, 500]];
 
       function curve(pts, d) {
         if (d <= pts[0][0]) return pts[0][1];
@@ -493,6 +1084,148 @@
       /* expose for verification + later passes */
       window.__dive = { ZONES: ZONES, depthAtScroll: depthAtScroll, scrollAtDepth: scrollAtDepth };
 
+      /* ============ THE RESIDENTS — accurate depths in meters ============ */
+      var CREATURES = [
+        /* —— sunlight zone 0–200 m —— */
+        { d: 8,    x: 0.31, w: 150, sym: 'c-school',     name: 'sardines, schooling', anim: 'swim' },
+        { d: 15,   x: 0.74, w: 124, sym: 'c-turtle',     name: 'green sea turtle',    anim: 'drift' },
+        { d: 24,   x: 0.07, w: 130, sym: 'c-kelp',       cap: 'giant kelp',           anim: 'sway' },
+        { d: 30,   x: 0.94, w: 110, sym: 'c-kelp',       cap: '',                     anim: 'sway', flip: true, lit: false },
+        { d: 27,   x: 0.77, type: 'fact', text: 'by ten meters down, the sea has swallowed every red.' },
+        { d: 33,   x: 0.22, w: 215, sym: 'c-pod',        name: 'spinner dolphins',    anim: 'swim' },
+        { d: 40,   type: 'line', text: '40 m — recreational scuba limit' },
+        { d: 62,   x: 0.72, w: 250, sym: 'c-manta',      name: 'manta ray',           anim: 'drift' },
+        { d: 100,  x: 0.22, w: 150, sym: 'c-jellies',    name: 'moon jellies',        anim: 'pulse' },
+        { d: 145,  x: 0.71, w: 250, sym: 'c-shark',      name: 'blue shark',          anim: 'swim', flip: true },
+        { d: 200,  type: 'line', text: '200 m — twilight zone · only ~1% of sunlight makes it this far' },
+
+        /* —— twilight zone 200–1,000 m —— */
+        { d: 218,  x: 0.73, type: 'mark', text: '214 m — deepest freedive\n(herbert nitsch, 2007)' },
+        { d: 258,  x: 0.26, w: 150, sym: 'c-krill',      name: 'krill, swarming',     anim: 'drift' },
+        { d: 300,  x: 0.72, w: 150, sym: 'c-lanternfish', cap: 'lanternfish — the most\nabundant vertebrate on earth', anim: 'swim' },
+        { d: 336,  x: 0.27, type: 'mark', text: '332 m — deepest scuba dive\n(ahmed gabr, 2014)' },
+        { d: 430,  x: 0.3,  w: 110, sym: 'c-hatchet',    name: 'silver hatchetfish',  anim: 'drift' },
+        { d: 535,  x: 0.71, type: 'mark', text: '535 m — an emperor penguin\nhas hunted this deep' },
+        { d: 595,  x: 0.13, w: 84,  sym: 'c-siphon',     cap: 'siphonophore — a colony\nlonger than a whale', anim: 'drift' },
+        { d: 660,  x: 0.76, w: 170, sym: 'c-gsquid',     cap: 'giant squid — first filmed\nalive near here, 2012', anim: 'hover' },
+        { d: 760,  x: 0.27, w: 130, sym: 'c-barreleye',  name: 'barreleye, eyes skyward', anim: 'drift' },
+        { d: 860,  x: 0.7,  w: 140, sym: 'c-vampire',    name: 'vampire squid',       anim: 'hover' },
+        { d: 950,  x: 0.48, w: 430, sym: 'c-whale',      cap: 'sperm whale, hunting', anim: 'swim', flip: true },
+        { d: 1000, type: 'line', text: '1,000 m — midnight zone · below this line, the sun has never been seen' },
+
+        /* —— midnight zone 1,000–4,000 m —— */
+        { d: 1150, x: 0.27, w: 160, sym: 'c-angler',     name: 'anglerfish, fishing', anim: 'drift' },
+        { d: 1280, x: 0.73, type: 'mark', text: '1,280 m — a leatherback turtle\nonce dove to here' },
+        { d: 1600, x: 0.7,  w: 140, sym: 'c-fang',       name: 'fangtooth',           anim: 'swim' },
+        { d: 1850, x: 0.26, w: 220, sym: 'c-gulper',     name: 'gulper eel',          anim: 'drift', flip: true },
+        { d: 2250, x: 0.31, type: 'mark', text: '2,250 m — where sperm whales\nbottom out' },
+        { d: 2500, x: 0.79, w: 250, sym: 'c-vent',       cap: 'hydrothermal vents — tube worms,\nyeti crabs, water at 380 °c' },
+        { d: 2890, x: 0.22, w: 270, sym: 'c-whalefall',  cap: 'a whale fall — one body\nfeeds the floor for decades' },
+        { d: 2992, x: 0.74, type: 'mark', text: '2,992 m — cuvier’s beaked whale,\nthe deepest-diving mammal' },
+        { d: 3220, x: 0.73, w: 140, sym: 'c-dumbo',      name: 'dumbo octopus',       anim: 'hover' },
+        { d: 3810, x: 0.27, w: 300, sym: 'c-titanic',    cap: 'r.m.s. titanic — 3,810 m' },
+        { d: 4000, type: 'line', text: '4,000 m — the abyss · water near 2 °c, pressure 400× the surface' },
+
+        /* —— the abyss 4,000–6,000 m —— */
+        { d: 4400, x: 0.72, w: 150, sym: 'c-tripod',     name: 'tripod fish, standing watch' },
+        { d: 4800, x: 0.26, w: 150, sym: 'c-seapig',     name: 'sea pigs, grazing the plain' },
+        { d: 5200, x: 0.7,  type: 'fact', text: 'xenophyophores live here — single cells the size of a fist.' },
+        { d: 5600, x: 0.29, w: 190, sym: 'c-rattail',    name: 'rattail, patrolling',  anim: 'swim' },
+        { d: 6000, type: 'line', text: '6,000 m — hadal zone · named for hades. only the trenches go deeper' },
+
+        /* —— hadal zone 6,000–10,935 m —— */
+        { d: 6500, x: 0.72, type: 'mark', text: '6,500 m — the ceiling of\nDSV alvin, our deepest sub' },
+        { d: 7400, x: 0.28, w: 150, sym: 'c-snailfish',  name: 'hadal snailfish, ghost-pale', anim: 'drift' },
+        { d: 7900, x: 0.71, w: 110, sym: 'c-amphi',      name: 'supergiant amphipod', anim: 'drift' },
+        { d: 8336, x: 0.3,  type: 'mark', text: '8,336 m — the deepest fish\never filmed (a snailfish, 2023)' },
+        { d: 9200, x: 0.7,  type: 'fact', text: 'nothing here but pressure — nine hundred atmospheres of it.' },
+        { d: 10200, x: 0.28, type: 'mark', text: 'only a handful of machines have been this deep —\ntrieste, 1960 · deepsea challenger, 2012 · limiting factor, 2019' },
+        { d: 10500, x: 0.6, w: 420, sym: 'c-eye',        cap: null, name: '', cls: 'v-ghost' }
+      ];
+
+      /* ============ VIGNETTE BUILDER ============ */
+      var vLayer = document.querySelector('.v-layer');
+      var litTrack = document.getElementById('lit-track');
+
+      function viewBoxOf(sym) { return document.getElementById(sym).getAttribute('viewBox'); }
+
+      function buildVignettes() {
+        var frag = document.createDocumentFragment();
+        for (var i = 0; i < CREATURES.length; i++) {
+          var c = CREATURES[i];
+          var type = c.type || 'creature';
+          var el = document.createElement('div');
+          var cls = 'vignette' + (type !== 'creature' ? ' v-' + type : '');
+          if (c.cls) cls += ' ' + c.cls;
+          c._S = scrollAtDepth(c.d) / screenPx + 0.5;
+          el.style.top = (c._S * 100).toFixed(3) + 'lvh';
+          if (type === 'creature') {
+            if (c.d >= 1020 && c.cls !== 'v-ghost') cls += ' v-deep';
+            if (c.flip) cls += ' flip';
+            if (c.anim) el.setAttribute('data-anim', c.anim);
+            el.style.left = (c.x * 100) + 'vw';
+            el.style.width = 'min(' + c.w + 'px, ' + (c.w * 100 / 660).toFixed(1) + 'vw)';
+            var capText = (c.cap === null) ? '' : (c.cap === undefined ? c.name + '  ·  −' + fmt(c.d) + ' m' : c.cap);
+            /* clone symbol content into the light DOM so CSS (dash
+               entrances, glow pulses, fills) can reach every shape */
+            el.innerHTML = '<div class="art"><svg viewBox="' + viewBoxOf(c.sym) + '" xmlns="http://www.w3.org/2000/svg">'
+              + document.getElementById(c.sym).innerHTML + '</svg></div>'
+              + (capText ? '<p class="v-cap">' + capText + '</p>' : '');
+          } else if (type === 'line') {
+            el.style.left = '50vw';
+            el.innerHTML = '<p class="v-cap">' + c.text + '</p><div class="rule"></div>';
+          } else {
+            el.style.left = (c.x * 100) + 'vw';
+            el.innerHTML = '<p class="v-cap">' + c.text + '</p>';
+          }
+          el.className = cls;
+          c._el = el;
+          frag.appendChild(el);
+        }
+        vLayer.appendChild(frag);
+      }
+
+      function mountLit(c) {
+        if (c._lit) return;
+        var el = document.createElement('div');
+        el.className = 'lit-v live' + (c.flip ? ' flip' : '');
+        el.style.top = c._el.style.top;
+        el.style.left = c._el.style.left;
+        el.style.width = c._el.style.width;
+        if (c.anim) el.setAttribute('data-anim', c.anim);
+        el.innerHTML = '<div class="art"><svg viewBox="' + viewBoxOf(c.sym) + '" xmlns="http://www.w3.org/2000/svg">'
+          + document.getElementById(c.sym).innerHTML + '</svg></div>';
+        c._lit = el;
+        litTrack.appendChild(el);
+        /* phase-sync the clone's ambient loop with the base copy */
+        if (c.anim && !reduceMotion && el.querySelector('.art').getAnimations) {
+          var ab = c._el.querySelector('.art').getAnimations();
+          var al = el.querySelector('.art').getAnimations();
+          if (ab.length && al.length) al[0].currentTime = ab[0].currentTime;
+        }
+      }
+      function unmountLit(c) { if (c._lit) { c._lit.remove(); c._lit = null; } }
+
+      /* windowing: ~44 entries — a full scan per dirty frame is trivial */
+      function windowPass(y) {
+        var loY = y - vh * 0.6, hiY = y + vh * 1.45;
+        for (var i = 0; i < CREATURES.length; i++) {
+          var c = CREATURES[i];
+          var top = c._S * screenPx;
+          var on = top > loY && top < hiY;
+          if (on === !!c._live) continue;
+          c._live = on;
+          if (on) {
+            c._el.classList.add('live');
+            if (!c._seen) { c._seen = true; c._el.classList.add('seen'); }
+            if ((c.type || 'creature') === 'creature' && c.lit !== false) mountLit(c);
+          } else {
+            c._el.classList.remove('live');
+            unmountLit(c);
+          }
+        }
+      }
+
       /* ============ HUD + VAR WRITES ============ */
       var meterEl = document.getElementById('hud-m');
       var zoneEl = document.getElementById('hud-zone');
@@ -507,6 +1240,13 @@
         if (lastVars[n] === q) return;
         lastVars[n] = q;
         root.style.setProperty(n, q);
+      }
+      function setVarU(n, v, unit, eps) {
+        var e = eps || 0.5;
+        var q = Math.round(v / e) * e;
+        if (lastVars[n] === q) return;
+        lastVars[n] = q;
+        root.style.setProperty(n, q + unit);
       }
 
       var lastMeter = null, lastZone = null, isNight = null, cueGone = false;
@@ -540,20 +1280,94 @@
           root.classList.toggle('ink-night', night);
           root.classList.toggle('ink-day', !night);
         }
+        setVar('--beam-o', curve(BEAMO, d));
+        setVarU('--beam-r', curve(BEAMR, d), 'px', 2);
+        windowPass(y);
+
         dotEl.style.transform = 'translateY(' + ((y + vh * 0.5) / worldH * railH).toFixed(1) + 'px)';
         if (!cueGone && y > screenPx * 0.4) { cueGone = true; cueEl.classList.add('gone'); }
+      }
+
+      /* ============ THE BEAM — the sub's steerable lantern ============ */
+      var subEl = document.getElementById('sub');
+      var lampEl = subEl.querySelector('.p-lamp');
+      var hasScrollTimeline = !!(window.CSS && CSS.supports && CSS.supports('animation-timeline: scroll()'));
+      var coarse = matchMedia('(pointer: coarse)').matches;
+      var bx = innerWidth * 0.5, by = innerHeight * 0.52, tbx = bx, tby = by;
+      var lastPointerT = -1e9;
+      var nose = { x: 0, y: 0 };
+
+      function aimVars() {
+        /* the pool of light sits ALONG the (clamped) cone, so beam and
+           pool always agree — the pointer steers, the physics holds */
+        var a = Math.atan2(by - nose.y, bx - nose.x) * 180 / Math.PI;
+        a = Math.max(-32, Math.min(80, a));
+        var rad = a * Math.PI / 180;
+        var dist = Math.min(Math.hypot(bx - nose.x, by - nose.y), vw * 0.55);
+        root.style.setProperty('--bx', (nose.x + Math.cos(rad) * dist).toFixed(1) + 'px');
+        root.style.setProperty('--by', (nose.y + Math.sin(rad) * dist).toFixed(1) + 'px');
+        setVarU('--beam-a', a, 'deg', 0.2);
+      }
+      function measureNose() {
+        var r = lampEl.getBoundingClientRect();
+        nose.x = r.left + r.width / 2;
+        nose.y = r.top + r.height / 2;
+      }
+
+      addEventListener('pointermove', function (e) {
+        lastPointerT = performance.now();
+        tbx = e.clientX; tby = e.clientY;
+        if (reduceMotion) { bx = tbx; by = tby; aimVars(); return; }
+        wake();
+      }, { passive: true });
+
+      function beamStep(now) {
+        if (reduceMotion) return false;
+        var lit = (lastVars['--beam-o'] || 0) > 0.03;
+        var sweeping = false;
+        if (lit && (coarse || now - lastPointerT > 2600)) {
+          var t = now / 1000;
+          tbx = vw * (0.56 + 0.27 * Math.sin(t * 0.22));
+          tby = vh * (0.54 + 0.24 * Math.sin(t * 0.143 + 1.2));
+          sweeping = true;
+        }
+        bx += (tbx - bx) * 0.07;
+        by += (tby - by) * 0.07;
+        var moving = Math.abs(tbx - bx) + Math.abs(tby - by) > 0.6;
+        if (moving || sweeping) aimVars();
+        return moving || sweeping;
+      }
+
+      /* sub pitches with scroll velocity, relaxes to a gentle dive trim */
+      var tilt = 5, tiltTarget = 5, lastTickY = 0, lastTickT = 0;
+      function tiltStep() {
+        if (reduceMotion) return false;
+        tilt += (tiltTarget - tilt) * 0.07;
+        setVarU('--sub-tilt', tilt, 'deg', 0.05);
+        tiltTarget += (5 - tiltTarget) * 0.05;
+        return Math.abs(tilt - 5) > 0.12 || Math.abs(tiltTarget - 5) > 0.12;
       }
 
       /* ============ THE TICK — one loop, sleeps when idle ============ */
       var dirty = true, awake = false;
 
-      function tick() {
+      function tick(now) {
+        now = now || performance.now();
         var busy = false;
         if (dirty) {
           dirty = false;
-          applyDepth(Math.min(maxY, Math.max(0, window.scrollY)));
+          var y = Math.min(maxY, Math.max(0, window.scrollY));
+          if (now > lastTickT && !reduceMotion) {
+            var vel = (y - lastTickY) / Math.max(8, now - lastTickT) * 1000;
+            tiltTarget = Math.max(-10, Math.min(17, 5 + vel * 0.004));
+          }
+          lastTickY = y; lastTickT = now;
+          applyDepth(y);
+          if (!hasScrollTimeline) litTrack.style.transform = 'translate3d(0,' + (-y) + 'px,0)';
           busy = true;
         }
+        busy = beamStep(now) || busy;
+        busy = tiltStep() || busy;
         if (busy) requestAnimationFrame(tick); else awake = false;
       }
       function wake() {
@@ -582,13 +1396,16 @@
         var d = depthAtScroll(window.scrollY);
         measure();
         buildTicks();
+        measureNose();
         scrollTo(0, Math.min(maxY, scrollAtDepth(d)));
         dirty = true; wake();
       });
 
       /* ============ BOOT — idempotent from any scrollY ============ */
       measure();
+      buildVignettes();
       buildTicks();
+      measureNose();
       var cssScreens = parseFloat(getComputedStyle(root).getPropertyValue('--total-screens'));
       if (Math.abs(cssScreens - TOTAL_SCREENS) > 0.001) {
         console.warn('[dive] screen count drift: CSS', cssScreens, 'vs JS', TOTAL_SCREENS);
