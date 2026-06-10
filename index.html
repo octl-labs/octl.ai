@@ -3,131 +3,144 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>octl — Coming soon</title>
+  <title>octl — AI-native productivity</title>
   <meta name="description" content="octl (pronounced &quot;octal&quot;) — AI-native productivity for individuals and teams." />
   <meta name="color-scheme" content="dark" />
-  <meta name="theme-color" content="#0a0a0a" />
-  <meta property="og:title" content="octl — Coming soon" />
+  <meta name="theme-color" content="#060605" />
+  <meta property="og:title" content="octl — AI-native productivity" />
   <meta property="og:description" content="AI-native productivity for individuals and teams." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://octl.ai/" />
+  <meta property="og:site_name" content="octl" />
   <meta name="twitter:card" content="summary" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23060605'/%3E%3Ctext x='32' y='46' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='42' fill='%23e2a93f'%3Eo%3C/text%3E%3C/svg%3E" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Martian+Mono:wght@300;400&display=swap" />
   <style>
     :root {
-      --bg: #0a0a0a;
-      --ink: #f5f4f1;
-      --ink-dim: #c8c6c0;
-      --muted: #888782;
-      --line: #232220;
-      --accent: #fbbf24;
-      --accent-soft: rgba(251, 191, 36, 0.45);
-      --max: 720px;
-      --mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --bg: #060605;
+      --ink: #f1ede4;
+      --ink-soft: #d9d4c8;
+      --muted: #8d8a80;
+      --line: #232118;
+      --accent: #e2a93f;
+      --mx: 50vw;
+      --my: 38vh;
+      --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+      --mono: 'Martian Mono', ui-monospace, 'SF Mono', Menlo, monospace;
     }
 
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; }
 
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-weight: 400;
+      font-family: var(--mono);
+      font-weight: 300;
       color: var(--ink);
       background: var(--bg);
-      background-image:
-        radial-gradient(ellipse 65% 55% at 50% 30%, rgba(251, 191, 36, 0.045), transparent 75%),
-        radial-gradient(ellipse 90% 70% at 50% 100%, rgba(245, 244, 241, 0.025), transparent 65%);
-      background-attachment: fixed;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
-      font-feature-settings: 'cv11', 'ss01', 'ss03';
       line-height: 1.5;
       min-height: 100vh;
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
-      animation: pageIn 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+      overflow-x: hidden;
     }
 
-    @keyframes pageIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* ---- The deep: octopus arms + the lantern ---------------------------- */
+
+    .deep {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
     }
 
-    /* Grain overlay — adds quiet warmth without files */
+    .arms {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      color: var(--ink);
+      opacity: 0.055;
+    }
+
+    .arms path, .arms circle {
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .arms circle { fill: currentColor; stroke: none; }
+
+    /* Lit copy of the arms — only visible inside the lantern's pool */
+    .arms-lit {
+      color: var(--accent);
+      opacity: 0.55;
+      -webkit-mask-image: radial-gradient(circle 430px at var(--mx) var(--my), #000 0%, transparent 100%);
+      mask-image: radial-gradient(circle 430px at var(--mx) var(--my), #000 0%, transparent 100%);
+    }
+
+    /* Warm pool of light that follows the pointer */
+    .glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle 540px at var(--mx) var(--my), rgba(236, 196, 120, 0.13), transparent 70%);
+      mix-blend-mode: screen;
+    }
+
+    /* Draw the arms once on arrival, then hold still */
+    .arms-base path {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: draw 2400ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+    }
+    .arms-base path:nth-of-type(1) { animation-delay: 300ms; }
+    .arms-base path:nth-of-type(2) { animation-delay: 420ms; }
+    .arms-base path:nth-of-type(3) { animation-delay: 540ms; }
+    .arms-base path:nth-of-type(4) { animation-delay: 660ms; }
+    .arms-base path:nth-of-type(5) { animation-delay: 780ms; }
+    .arms-base path:nth-of-type(6) { animation-delay: 900ms; }
+    .arms-base path:nth-of-type(7) { animation-delay: 1020ms; }
+    .arms-base path:nth-of-type(8) { animation-delay: 1140ms; }
+
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+
+    .deep > * { animation: bloom 1800ms ease-out both; }
+
+    @keyframes bloom {
+      from { opacity: 0; }
+    }
+
+    /* Grain — quiet warmth over everything, light included */
     body::before {
       content: '';
       position: fixed;
       inset: 0;
       pointer-events: none;
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      opacity: 0.5;
+      opacity: 0.45;
       mix-blend-mode: overlay;
-      z-index: 0;
+      z-index: 1;
     }
 
-    header, main, footer { position: relative; z-index: 1; }
+    ::selection { background: var(--accent); color: var(--bg); }
 
-    header, footer {
-      padding: 28px 40px;
+    /* ---- Type ------------------------------------------------------------ */
+
+    main, footer { position: relative; z-index: 2; }
+
+    .rise {
+      animation: rise 900ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+      animation-delay: var(--d, 0s);
     }
 
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .mark {
-      font-family: var(--mono);
-      font-weight: 400;
-      font-size: 13px;
-      letter-spacing: 0.01em;
-      color: var(--ink-dim);
-    }
-
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-family: var(--mono);
-      font-size: 11px;
-      font-weight: 400;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--ink-dim);
-      padding: 6px 12px 6px 10px;
-      border: 1px solid var(--line);
-      border-radius: 999px;
-      background: rgba(255, 255, 255, 0.015);
-    }
-
-    .status-dot {
-      position: relative;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--accent);
-      flex: none;
-    }
-
-    .status-dot::after {
-      content: '';
-      position: absolute;
-      inset: -4px;
-      border-radius: 50%;
-      background: var(--accent);
-      opacity: 0.6;
-      animation: pulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-
-    @keyframes pulse {
-      0%   { transform: scale(0.6); opacity: 0.6; }
-      80%  { transform: scale(2.2); opacity: 0; }
-      100% { transform: scale(2.2); opacity: 0; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     main {
@@ -135,185 +148,200 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 48px 40px 96px;
+      padding: 72px 24px;
     }
 
     .stack {
-      width: 100%;
-      max-width: var(--max);
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
+      align-items: center;
+      text-align: center;
+      max-width: 680px;
     }
 
-    .hero {
-      position: relative;
-      display: inline-block;
-      margin: 0;
+    .est {
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.42em;
+      text-indent: 0.42em; /* re-center tracked uppercase */
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 22px;
     }
 
     .wordmark {
-      font-size: clamp(5rem, 14vw, 10rem);
-      font-weight: 600;
-      letter-spacing: -0.055em;
-      line-height: 0.9;
-      color: var(--ink);
+      font-family: var(--serif);
+      font-optical-sizing: auto;
+      font-weight: 380;
+      font-size: clamp(5.5rem, 17vw, 11rem);
+      letter-spacing: -0.015em;
+      line-height: 0.85;
       margin: 0;
-      display: inline-block;
-      background: linear-gradient(180deg, var(--ink) 0%, var(--ink-dim) 100%);
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .glyph {
-      position: absolute;
-      top: -14px;
-      right: -64px;
-      width: 48px;
-      height: auto;
-      color: var(--accent);
-      opacity: 0.85;
-      animation: float 7s ease-in-out infinite;
-    }
-
-    .glyph path {
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 1.5;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0) rotate(-2deg); }
-      50%      { transform: translateY(-8px) rotate(2deg); }
+      color: var(--ink);
     }
 
     .ipa {
-      font-family: var(--mono);
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--muted);
-      margin: 24px 0 0;
-      letter-spacing: 0.01em;
-    }
-
-    .ipa-sep { color: var(--line); margin: 0 8px; }
-
-    .tagline {
-      font-size: clamp(1.125rem, 2vw, 1.375rem);
-      font-weight: 400;
-      color: var(--ink-dim);
-      letter-spacing: -0.013em;
-      line-height: 1.4;
-      margin: 56px 0 64px;
-      max-width: 32ch;
-    }
-
-    .meta {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      border-top: 1px solid var(--line);
-      padding-top: 24px;
-      width: 100%;
-    }
-
-    .meta-row {
-      display: flex;
-      gap: 24px;
-      font-size: 14px;
-      line-height: 1.5;
-      align-items: baseline;
-    }
-
-    .meta-label {
-      flex: 0 0 110px;
-      color: var(--muted);
-      font-family: var(--mono);
       font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      margin: 30px 0 0;
     }
 
-    .meta-value {
+    .ipa-sep { color: var(--line); margin: 0 10px; }
+
+    .statement {
+      font-family: var(--serif);
+      font-optical-sizing: auto;
+      font-style: italic;
+      font-weight: 360;
+      font-size: clamp(1.5rem, 3.2vw, 2.05rem);
+      letter-spacing: 0.002em;
+      line-height: 1.4;
+      color: var(--ink-soft);
+      margin: 74px 0 0;
+      max-width: 24ch;
+      text-wrap: balance;
+    }
+
+    .quiet {
+      font-size: 11.5px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+      margin: 26px 0 0;
+    }
+
+    .names {
+      font-family: var(--serif);
+      font-optical-sizing: auto;
+      font-weight: 420;
+      font-size: 19px;
+      letter-spacing: 0.01em;
       color: var(--ink);
+      margin: 72px 0 0;
+    }
+
+    .names .dot { color: var(--muted); margin: 0 14px; }
+
+    .mail {
+      font-size: 12.5px;
+      letter-spacing: 0.05em;
+      margin: 18px 0 0;
     }
 
     a {
-      color: var(--ink);
-      text-decoration: none;
-      border-bottom: 1px solid var(--line);
-      transition: border-color 200ms ease, color 200ms ease;
+      color: inherit;
+      text-decoration: underline;
+      text-decoration-color: var(--muted);
+      text-decoration-thickness: 1px;
+      text-underline-offset: 5px;
+      transition: color 250ms ease, text-decoration-color 250ms ease;
     }
 
     a:hover {
-      border-bottom-color: var(--accent);
       color: var(--accent);
+      text-decoration-color: var(--accent);
+    }
+
+    a:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 4px;
+      border-radius: 1px;
     }
 
     footer {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: var(--mono);
-      font-size: 12px;
+      justify-content: center;
+      padding: 0 24px 30px;
+      font-size: 10px;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
       color: var(--muted);
-      border-top: 1px solid var(--line);
-      margin: 0 40px;
-      padding: 24px 0;
     }
 
     @media (max-width: 640px) {
-      header, main { padding-left: 24px; padding-right: 24px; }
-      header { padding-top: 20px; padding-bottom: 20px; }
-      footer { margin: 0 24px; padding: 20px 0; }
-      main { padding-top: 24px; padding-bottom: 64px; }
-      .status { padding: 5px 10px 5px 9px; letter-spacing: 0.14em; }
-      .glyph {
-        position: static;
-        margin: 0 0 12px;
-        width: 38px;
-      }
-      .wordmark { letter-spacing: -0.045em; }
-      .tagline { font-size: 1.0625rem; margin: 36px 0 44px; max-width: none; }
-      .meta-label { flex: 0 0 90px; font-size: 10.5px; }
-      .meta-row { font-size: 13px; gap: 16px; }
-      footer { flex-direction: column; gap: 6px; align-items: flex-start; }
+      main { padding: 56px 20px; }
+      .statement { margin-top: 56px; }
+      .names { margin-top: 56px; font-size: 17px; }
+      .names .dot { margin: 0 10px; }
+      footer { padding-bottom: 24px; letter-spacing: 0.14em; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      body, .glyph, .status-dot::after { animation: none; }
+      .rise, .deep > *, .arms-base path { animation: none; }
+      .arms-base path { stroke-dashoffset: 0; }
     }
   </style>
 </head>
 <body>
-  <header>
-    <span class="mark">octl.ai</span>
-    <span class="status">
-      <span class="status-dot" aria-hidden="true"></span>
-      Coming soon
-    </span>
-  </header>
+  <div class="deep" aria-hidden="true">
+    <svg class="arms arms-base" viewBox="0 0 1440 900" preserveAspectRatio="xMaxYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <g id="armset">
+        <path pathLength="1" stroke-width="2.4" d="M 1430 930 C 1150 860 940 760 800 620 C 680 500 640 380 700 280 C 740 215 820 200 850 250 C 875 292 840 340 795 330 C 762 322 755 285 778 268" />
+        <path pathLength="1" stroke-width="2" d="M 1460 760 C 1280 700 1140 630 1040 520 C 950 420 940 310 1020 250 C 1075 210 1140 235 1130 290 C 1122 332 1070 340 1052 305" />
+        <path pathLength="1" stroke-width="1.8" d="M 1380 950 C 1120 900 900 880 700 850 C 510 822 380 740 340 620 C 312 535 360 460 425 480 C 478 496 480 560 430 575" />
+        <path pathLength="1" stroke-width="1.6" d="M 1470 620 C 1340 580 1250 510 1200 420 C 1150 330 1170 240 1250 205 C 1305 181 1355 220 1335 265 C 1318 302 1270 295 1262 260" />
+        <path pathLength="1" stroke-width="1.4" d="M 1320 960 C 1100 940 940 950 790 960 C 640 970 520 940 470 880" />
+        <path pathLength="1" stroke-width="1.3" d="M 1465 880 C 1340 830 1255 775 1205 700 C 1158 630 1170 555 1230 530 C 1272 512 1305 545 1288 575" />
+        <path pathLength="1" stroke-width="1.1" d="M 1430 990 C 1330 930 1265 890 1215 845 C 1170 805 1150 760 1165 720" />
+        <path pathLength="1" stroke-width="1" d="M 1475 700 C 1400 670 1345 635 1310 585 C 1280 542 1282 500 1310 480" />
+      </g>
+    </svg>
+    <svg class="arms arms-lit" viewBox="0 0 1440 900" preserveAspectRatio="xMaxYMid slice" xmlns="http://www.w3.org/2000/svg">
+      <use href="#armset" />
+      <g class="suckers">
+        <circle cx="1245" cy="868" r="2.4" /><circle cx="1175" cy="842" r="2.2" />
+        <circle cx="1085" cy="800" r="2.2" /><circle cx="1005" cy="748" r="2" />
+        <circle cx="930" cy="688" r="2" /><circle cx="862" cy="618" r="1.8" />
+        <circle cx="1280" cy="582" r="1.8" /><circle cx="1262" cy="548" r="1.6" />
+      </g>
+    </svg>
+    <div class="glow"></div>
+  </div>
 
   <main>
     <div class="stack">
-      <div class="hero">
-        <svg class="glyph" viewBox="0 0 80 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M 40 8 Q 58 38 48 70 Q 36 100 56 132 Q 70 156 52 174 Q 38 184 40 168" />
-        </svg>
-        <h1 class="wordmark">octl</h1>
-        <p class="ipa">/&#39;ɒktəl/<span class="ipa-sep">·</span>pronounced &ldquo;octal&rdquo;</p>
-      </div>
+      <p class="est rise">est. 2026</p>
+      <h1 class="wordmark rise" style="--d: 0.08s">octl</h1>
+      <p class="ipa rise" style="--d: 0.16s"><span aria-hidden="true">/&#39;ɒktəl/</span><span class="ipa-sep" aria-hidden="true">·</span>pronounced &ldquo;octal&rdquo;</p>
 
-      <p class="tagline">AI-native productivity for individuals and teams.</p>
+      <p class="statement rise" style="--d: 0.26s">AI-native productivity for individuals and&nbsp;teams.</p>
+      <p class="quiet rise" style="--d: 0.34s">We&rsquo;re building heads-down. More when it&rsquo;s ready.</p>
+
+      <p class="names rise" style="--d: 0.5s">
+        <a href="https://www.linkedin.com/in/andrewhyi" target="_blank" rel="noopener" aria-label="Andrew Yi — LinkedIn">Andrew Yi</a><span class="dot" aria-hidden="true">·</span><a href="https://www.linkedin.com/in/ben" target="_blank" rel="noopener" aria-label="Ben Yi — LinkedIn">Ben Yi</a>
+      </p>
+      <p class="mail rise" style="--d: 0.58s"><a href="mailto:hello@octl.ai">hello@octl.ai</a></p>
     </div>
   </main>
 
-  <footer>
-    <span>&copy; 2026 Octl, Inc.</span>
-    <span>octl.ai</span>
+  <footer class="rise" style="--d: 0.66s">
+    <span>&copy; 2026 Octl Labs, Inc.</span>
   </footer>
+
+  <script>
+    // The lantern: a warm pool of light follows the pointer.
+    (function () {
+      var root = document.documentElement;
+      var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var tx = innerWidth / 2, ty = innerHeight * 0.38, x = tx, y = ty, raf = 0;
+      function frame() {
+        x += (tx - x) * 0.085;
+        y += (ty - y) * 0.085;
+        root.style.setProperty('--mx', x + 'px');
+        root.style.setProperty('--my', y + 'px');
+        raf = (Math.abs(tx - x) + Math.abs(ty - y) > 0.5) ? requestAnimationFrame(frame) : 0;
+      }
+      addEventListener('pointermove', function (e) {
+        tx = e.clientX; ty = e.clientY;
+        if (reduce) {
+          root.style.setProperty('--mx', tx + 'px');
+          root.style.setProperty('--my', ty + 'px');
+          return;
+        }
+        if (!raf) raf = requestAnimationFrame(frame);
+      }, { passive: true });
+    })();
+  </script>
 </body>
 </html>
