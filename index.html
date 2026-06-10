@@ -307,8 +307,8 @@
     }
     .vignette.flip .art svg { transform: scaleX(-1); }
 
-    /* deep silhouettes: barely-there line work, full-strength glow dots */
-    .vignette.v-deep { color: rgba(170, 196, 208, 0.34); }
+    /* deep silhouettes: ghostly bodies, full-strength glow dots */
+    .vignette.v-deep { color: rgba(170, 196, 208, 0.42); }
     /* ghosts exist only inside the beam */
     .vignette.v-ghost { color: rgba(170, 196, 208, 0.06); }
     .vignette.v-ghost .pupil, .lit-v .pupil { fill: currentColor; stroke: none; }
@@ -320,16 +320,23 @@
     .vignette.live .art .v-glow { animation-play-state: running; }
     @keyframes glowpulse { 50% { opacity: 0.3; } }
 
-    /* bioluminescent ink: every sprite = body silhouette (currentColor
-       fill via attributes, so it auto-tints teal in the beam and dims in
-       the deep) + rim-light stroke + fine detail + glow/halo pairs.
-       Bodies fade up while the strokes dash-draw. */
-    .vignette .art .v-body { opacity: 0; transition: opacity 900ms ease 450ms; }
-    .vignette.seen .art .v-body, .lit-v .v-body { opacity: 1; }
-    .vignette .art .v-halo, .lit-v .v-halo { stroke: none; }
+    /* deep-ink cel: every sprite is a SOLID currentColor silhouette (so
+       it still tints teal in the beam and dims in the deep), modeled by
+       a fixed pale light-band on the lit side and a fixed dark shade-
+       band beneath — cel shading that rides on top of the tint system —
+       plus one thick rim-light stroke, game eyes, and bloom glows.
+       Fills fade up while the few remaining strokes dash-draw. */
+    .vignette .art :is(.v-body, .v-shade, .v-light) { opacity: 0; transition: opacity 900ms ease 350ms; }
+    .vignette.seen .art :is(.v-body, .v-shade, .v-light),
+    .lit-v :is(.v-body, .v-shade, .v-light) { opacity: 1; }
+    .vignette .art :is(.v-halo, .v-shade, .v-light),
+    .lit-v :is(.v-halo, .v-shade, .v-light) { stroke: none; }
+    /* in the beam, banding flattens — light fills the form */
+    .lit-v .v-shade { opacity: 0.35; }
 
-    /* one-time dash-draw entrance when first windowed */
-    .vignette.seen .art :is(path, circle, ellipse, line, use):not(.v-glow):not(.v-body):not(.v-halo) {
+    /* one-time dash-draw entrance: only stroked shapes draw in */
+    .vignette.seen .art :is(path, circle, ellipse, line)[stroke-width],
+    .vignette.seen .art use {
       stroke-dasharray: 1; stroke-dashoffset: 1;
       animation: draw 1600ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
     }
@@ -632,9 +639,9 @@
   <svg width="0" height="0" style="position:absolute" aria-hidden="true" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <symbol id="c-fish" viewBox="0 0 22 12">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.14;stroke:none" d="M 3 6 Q 8 2 14 6 Q 8 10 3 6 Z M 14 6 L 19 3 L 18 6 L 19 9 Z" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 4 5 Q 8 2.5 13 5.4" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" d="M 14 6 L 19 3 M 14 6 L 19 9" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.32;stroke:none" d="M 3 6 C 6 3 10 2 14 6 C 10 10 6 9 3 6 Z M 14 6 L 19 3 L 18 6 L 19 9 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.3" d="M 4 5 C 7 3 10 2.6 13 5 C 10 3.6 7 3.8 4 5 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 4 5 C 7 3 10 3 13 5.4" />
       </symbol>
       <symbol id="c-school" viewBox="0 0 170 110">
         <use href="#c-fish" x="6" y="10" width="22" height="12" />
@@ -653,39 +660,38 @@
       </symbol>
 
       <symbol id="c-turtle" viewBox="0 0 120 78">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.1;stroke:none" d="M 26 40 Q 26 17 54 13 Q 82 17 84 40 Q 82 55 54 58 Q 26 55 26 40 Z" />
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.09;stroke:none" d="M 84 32 Q 90 26 96 24 Q 103 17 111 24 Q 115 30 108 36 Q 100 39 95 33 Q 90 36 84 42 Z" />
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.09;stroke:none" d="M 66 52 Q 78 60 92 74 Q 74 71 62 57 Z M 36 53 Q 29 62 17 67 Q 26 56 31 50 Z" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 28 32 Q 33 18 54 14 Q 76 17 83 33" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 26 40 Q 28 52 54 58 Q 80 52 84 40" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.5" d="M 40 22 Q 54 18 68 22 M 33 32 H 78 M 37 45 Q 54 50 73 45 M 47 15 V 56 M 62 15 V 56" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 84 33 Q 90 27 96 25 Q 103 18 110 24 Q 114 30 108 35 Q 100 38 95 32 Q 90 36 84 41" />
-        <circle class="v-glow" style="fill:var(--accent)" cx="105" cy="27" r="1.2" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 66 52 Q 78 60 92 74 Q 74 71 62 57" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 36 53 Q 29 62 17 67 Q 26 56 31 50" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.45" d="M 70 56 Q 79 63 86 70" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.3;stroke:none" d="M 26 40 C 26 22 38 13 54 13 C 72 13 84 24 84 40 C 84 52 70 58 54 58 C 38 58 26 52 26 40 Z M 84 32 C 89 28 94 25 98 24 C 103 18 111 19 113 26 C 114 32 109 37 102 36 C 98 36 95 34 94 31 C 91 34 87 37 84 41 Z M 64 53 C 73 58 83 66 91 75 C 80 73 69 66 61 57 Z M 37 54 C 32 61 25 66 17 68 C 23 61 28 55 31 50 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.24" d="M 29 31 C 34 18 45 14 55 14 C 67 14 77 20 81 30 C 75 22 65 17.5 54 17.5 C 43 17.5 34 23 29 31 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.26" d="M 27 45 C 33 53 44 58 56 57.5 C 70 57 79 51 83 44 C 80 54 68 59.5 54 59 C 41 58.5 31 53 27 45 Z M 66 56 C 74 62 82 68 89 74 C 79 71 70 65 63 58 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.8" d="M 27 33 C 32 17 44 13.5 55 13.5 C 70 14 81 23 83 34" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.45" d="M 33 32 H 78 M 37 45 C 48 50 62 50 73 45 M 47 15 V 56 M 63 15 V 56" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 84 33 C 89 28 94 26 98 25 C 103 19 111 20 112.5 26 C 114 32 109 36 102 35.5" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.5;stroke:none" cx="105" cy="27" r="1.9" />
+        <circle class="pupil" style="fill:#fff;opacity:0.8" cx="104.4" cy="26.3" r="0.6" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 64 53 C 73 58 83 66 91 75" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 37 54 C 32 61 25 66 17 68" />
       </symbol>
 
       <symbol id="c-kelp" viewBox="0 0 90 220">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.11;stroke:none" d="M 31 192 Q 16 190 7 176 Q 4 170 10 171 Q 20 180 33 188 Z M 30 152 Q 46 148 55 132 Q 58 125 52 127 Q 42 138 28 148 Z M 29 116 Q 14 112 7 96 Q 5 90 11 92 Q 19 102 31 112 Z M 32 78 Q 48 72 56 56 Q 58 50 52 53 Q 43 64 30 74 Z M 34 40 Q 20 34 14 18 Q 12 12 18 15 Q 26 26 36 36 Z M 64 188 Q 78 184 85 168 Q 87 162 81 165 Q 72 176 62 184 Z M 65 146 Q 52 142 45 128 Q 43 122 49 125 Q 56 134 67 142 Z M 67 102 Q 80 96 87 82 Q 89 76 83 79 Q 75 90 65 98 Z" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.7" d="M 30 218 C 38 182 22 150 32 112 C 40 84 26 48 36 6" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 62 218 C 68 192 58 168 66 140 C 72 118 62 96 68 72" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 30 150 Q 44 146 53 132 M 32 76 Q 46 70 54 58" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" opacity="0.5" d="M 31 190 Q 20 186 10 175 M 29 114 Q 18 110 9 98 M 64 186 Q 74 182 82 170 M 66 100 Q 76 94 84 84" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="36" cy="8" r="2.6" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="68" cy="74" r="2.2" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.3;stroke:none" d="M 31 192 C 21 191 11 184 6 174 C 4 169 9 169 12 172 C 19 179 26 184 33 188 Z M 30 152 C 40 150 50 142 55 131 C 57 125 52 126 49 130 C 43 138 36 145 28 149 Z M 29 116 C 19 114 10 105 6 94 C 4 89 9 89 12 93 C 18 101 24 108 31 112 Z M 32 78 C 42 75 52 67 56 55 C 58 49 53 51 50 55 C 44 63 38 70 30 75 Z M 34 40 C 25 36 16 27 13 16 C 11 11 16 12 19 16 C 25 24 30 31 36 36 Z M 64 188 C 73 186 82 178 86 167 C 88 161 83 163 80 167 C 74 175 68 181 62 184 Z M 65 146 C 56 144 48 136 44 126 C 42 121 47 122 50 126 C 56 133 61 139 67 142 Z M 67 102 C 76 99 84 91 88 81 C 90 75 85 77 82 81 C 76 89 71 95 65 99 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.16" d="M 30 151 C 38 149 46 143 51 134 C 46 140 39 146 30 149 Z M 33 77 C 41 74 48 68 52 60 C 47 66 41 72 32 75 Z M 65 145 C 58 143 51 137 47 130 C 52 136 58 141 66 143 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2" d="M 30 218 C 38 182 22 150 32 112 C 40 84 26 48 36 6" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.7" d="M 62 218 C 68 192 58 168 66 140 C 72 118 62 96 68 72" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" cx="36" cy="8" r="2.6" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" cx="68" cy="74" r="2.2" />
       </symbol>
 
       <symbol id="c-dolphin" viewBox="0 0 156 74">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.11;stroke:none" d="M 14 42 Q 30 20 66 16 Q 98 14 122 26 Q 136 32 142 38 L 150 41 Q 152 43 148 44 L 136 43 Q 124 52 100 54 Q 60 58 32 50 Q 20 47 14 42 Z M 14 42 Q 6 32 2 22 Q 12 30 19 37 Z M 15 45 Q 8 53 5 63 Q 14 53 20 48 Z M 70 17 Q 74 4 88 5 Q 78 10 78 17 Z M 58 50 Q 58 63 46 68 Q 53 58 52 50 Z" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 18 38 Q 36 20 70 16 Q 102 14 126 27" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 70 17 Q 74 4 88 5 Q 78 10 78 17" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 14 42 Q 6 32 2 22 Q 12 30 19 37 M 15 45 Q 8 53 5 63 Q 14 53 20 48" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 58 50 Q 58 63 46 68 Q 53 58 52 50" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.5" d="M 26 46 Q 60 53 100 51" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 132 38 Q 140 41 148 42" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" cx="118" cy="30" r="1.5" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" opacity="0.5" d="M 104 17 Q 107 15 110 17" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.3;stroke:none" d="M 14 42 C 24 26 44 17 68 16 C 92 15 112 20 126 28 C 134 33 139 37 142 39 L 150 41 C 152 42 151 44 148 44 L 136 43 C 126 50 110 54 94 55 C 68 57 42 53 26 47 C 20 45 16 43 14 42 Z M 14 42 C 8 35 3 28 2 21 C 9 28 15 34 19 38 Z M 15 45 C 10 52 6 60 5 65 C 11 58 16 51 20 48 Z M 70 17 C 72 8 79 4 88 5 C 81 9 78 13 78 17 Z M 58 50 C 59 58 54 65 46 68 C 51 61 52 55 52 50 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.26" d="M 26 46 C 44 53 70 56 94 53 C 112 51 126 46 134 42 C 124 50 106 55 88 56 C 64 57.5 42 53 26 46 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.2" d="M 22 40 C 34 26 54 18.5 76 17.5 C 98 16.5 116 21 128 29 C 114 23 94 19.5 74 21 C 53 22.5 35 30 22 40 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.8" d="M 17 39 C 28 26 48 17.5 70 16.5 C 94 15.5 112 20 127 28" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 70 17 C 72 8 79 4 88 5 C 81 9 78 13 78 17" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 14 42 C 8 35 3 28 2 21 M 15 45 C 10 52 6 60 5 65" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 58 50 C 59 58 54 65 46 68" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 132 38 C 138 40 144 41 148 42" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.55;stroke:none" cx="118" cy="30" r="2" />
+        <circle class="pupil" style="fill:#fff;opacity:0.8" cx="117.3" cy="29.2" r="0.6" />
       </symbol>
       <symbol id="c-pod" viewBox="0 0 280 150">
         <use href="#c-dolphin" x="0" y="0" width="156" height="74" />
@@ -694,27 +700,29 @@
       </symbol>
 
       <symbol id="c-manta" viewBox="0 0 184 78">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.11;stroke:none" d="M 6 40 Q 50 6 90 28 Q 130 6 178 40 Q 130 52 94 45 Q 56 54 6 40 Z M 80 30 Q 75 21 67 20 Q 72 28 78 32 Z M 100 30 Q 105 21 113 20 Q 108 28 102 32 Z" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 10 38 Q 50 8 88 28" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 92 28 Q 130 8 174 38" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 80 30 Q 75 21 67 20 M 100 30 Q 105 21 113 20" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.5" d="M 84 38 Q 90 41 96 38 M 82 43 Q 90 46 98 43" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 92 46 Q 95 62 89 77" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.3;stroke:none" d="M 6 40 C 34 16 64 12 90 28 C 116 12 148 16 178 40 C 146 50 116 50 94 45 C 70 51 36 50 6 40 Z M 80 30 C 78 24 73 20 67 20 C 71 26 75 30 78 32 Z M 100 30 C 102 24 107 20 113 20 C 109 26 105 30 102 32 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.22" d="M 12 37 C 38 18 64 15 88 29 C 64 19 40 22 12 37 Z M 92 29 C 116 15 144 18 172 37 C 144 22 118 19 92 29 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.24" d="M 16 41 C 44 49 70 49 92 44 C 116 49 144 48 168 41 C 142 50 116 51 93 46 C 70 52 42 50 16 41 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.8" d="M 10 38 C 38 17 64 14 88 28" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.8" d="M 92 28 C 118 14 146 18 174 38" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 80 30 C 78 24 73 20 67 20 M 100 30 C 102 24 107 20 113 20" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 92 46 C 95 58 93 69 89 77" />
         <circle class="v-glow" style="fill:var(--accent)" cx="74" cy="26" r="1.2" />
         <circle class="v-glow" style="fill:var(--accent)" cx="106" cy="26" r="1.2" />
       </symbol>
 
       <symbol id="c-jelly" viewBox="0 0 60 72">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.07;stroke:none" d="M 8 27 Q 8 6 30 6 Q 52 6 52 27 Q 47 31 41 28 Q 36 32 30 29 Q 24 32 19 28 Q 13 31 8 27 Z" />
-        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.1" cx="30" cy="17" rx="17" ry="8" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 10 22 Q 13 8 30 6 Q 47 8 50 22" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 8 27 Q 13 32 19 28 Q 24 33 30 29 Q 36 33 41 28 Q 47 32 52 27" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.45" d="M 30 9 V 26 M 19 12 Q 23 20 21 27 M 41 12 Q 37 20 39 27" />
+        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.09" cx="30" cy="18" rx="20" ry="11" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.2;stroke:none" d="M 8 27 C 8 12 17 6 30 6 C 43 6 52 12 52 27 C 48 30 44 30 41 28 C 38 31 34 31 30 29 C 26 31 22 31 19 28 C 16 30 11 30 8 27 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.26" d="M 11 19 C 13 10 21 7 30 7 C 39 7 47 10 49 19 C 44 12 37 9.5 30 9.5 C 23 9.5 16 12 11 19 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.16" d="M 9 26 C 15 29 22 30 30 29.5 C 38 29 45 28 51 26 C 46 30 38 31.5 30 31 C 22 30.5 14 29 9 26 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.6" d="M 10 22 C 12 10 20 6.5 30 6.5 C 40 6.5 48 10 50 22" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 8 27 C 12 31 16 31 19 28 C 23 32 27 32 30 29 C 34 32 38 32 41 28 C 45 31 49 31 52 27" />
         <ellipse class="v-glow" style="fill:var(--accent)" cx="30" cy="17" rx="10" ry="4" opacity="0.6" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.8" d="M 17 31 Q 13 45 17 57" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.8" d="M 26 33 Q 24 49 28 63" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.8" d="M 36 33 Q 38 47 34 59" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.8" d="M 45 30 Q 48 43 44 53" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" opacity="0.8" d="M 17 31 C 13 41 14 50 17 57" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" opacity="0.8" d="M 26 33 C 23 44 25 55 28 63" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" opacity="0.8" d="M 36 33 C 39 43 37 52 34 59" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" opacity="0.8" d="M 45 30 C 48 39 47 47 44 53" />
       </symbol>
       <symbol id="c-jellies" viewBox="0 0 150 140">
         <use href="#c-jelly" x="0" y="0" width="60" height="72" />
@@ -723,24 +731,26 @@
       </symbol>
 
       <symbol id="c-shark" viewBox="0 0 224 80">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.11;stroke:none" d="M 8 44 Q 9 40 16 38 Q 60 22 124 24 Q 168 26 198 36 L 214 43 Q 217 45 212 47 L 196 46 Q 170 52 130 51 Q 70 53 24 48 Q 12 47 8 44 Z M 8 44 Q 2 30 7 14 Q 13 32 19 39 Z M 9 46 Q 4 57 9 66 Q 14 55 19 48 Z M 94 26 Q 98 8 116 11 Q 102 15 103 25 Z M 118 49 Q 116 65 132 71 Q 126 59 130 51 Z" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 14 39 Q 60 22 124 24 Q 166 26 196 36" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 94 26 Q 98 8 116 11 Q 102 15 103 25" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 8 44 Q 2 30 7 14 Q 13 32 19 39 M 9 46 Q 4 57 9 66 Q 14 55 19 48" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 118 49 Q 116 65 132 71 Q 126 59 130 51" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.55" d="M 158 32 Q 160 38 158 44 M 166 31 Q 168 37 166 44 M 174 31 Q 176 37 174 43" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" opacity="0.4" d="M 30 41 Q 100 34 182 39" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 204 46 Q 194 50 186 49" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" cx="193" cy="36" r="1.6" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.3;stroke:none" d="M 8 44 C 9 41 12 39 16 38 C 50 24 88 22 124 24 C 154 26 180 30 198 36 L 214 43 C 217 45 215 47 212 47 L 196 46 C 176 51 152 52 130 51 C 92 53 50 51 24 48 C 15 47 10 46 8 44 Z M 8 44 C 3 34 4 23 7 14 C 11 25 15 34 19 39 Z M 9 46 C 5 53 6 61 9 66 C 12 58 16 51 19 48 Z M 94 26 C 96 16 104 10 116 11 C 107 14 103 19 103 25 Z M 118 49 C 117 59 122 67 132 71 C 127 62 128 55 130 51 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.24" d="M 24 42 C 60 50 110 52 150 49 C 172 47 188 44 198 41 C 184 48 160 52 132 52.5 C 94 54 52 51 24 46 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.22" d="M 18 38 C 52 25 92 22.5 128 24.5 C 158 26 180 31 195 36 C 176 32 150 28.5 122 28 C 84 27 46 31 18 41 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.8" d="M 14 39 C 50 24 88 22.5 124 24.5 C 154 26.5 178 30 196 36" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 94 26 C 96 16 104 10 116 11 C 107 14 103 19 103 25" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 8 44 C 3 34 4 23 7 14 C 11 25 15 34 19 39 M 9 46 C 5 53 6 61 9 66 C 12 58 16 51 19 48" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 118 49 C 117 59 122 67 132 71 C 127 62 128 55 130 51" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.5" d="M 158 32 C 160 36 160 40 158 44 M 166 31 C 168 35 168 40 166 44 M 174 31 C 176 35 176 39 174 43" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 204 46 C 198 49 192 50 186 49" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.55;stroke:none" cx="193" cy="36" r="2" />
+        <circle class="pupil" style="fill:#fff;opacity:0.8" cx="192.3" cy="35.3" r="0.6" />
       </symbol>
 
       <symbol id="c-krill1" viewBox="0 0 50 36">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.12;stroke:none" d="M 8 16 Q 18 7 28 12 Q 38 17 37 26 Q 35 31 29 32 Q 19 27 8 16 Z" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 9 15 Q 18 8 28 12.5" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" d="M 37 25 Q 35 31 29 32" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.8" opacity="0.7" d="M 13 18 Q 11 23 7 25 M 19 16 Q 18 22 14 25 M 25 15 Q 25 21 21 24 M 30 17 Q 31 23 27 26" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.8" d="M 8 16 Q 2 11 3 4 M 9 14 Q 5 8 8 2" />
-        <circle class="v-glow" style="fill:var(--accent)" cx="11" cy="13" r="1" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.3;stroke:none" d="M 8 16 C 14 9 22 8 28 12 C 35 16 38 21 37 26 C 36 30 33 32 29 32 C 21 28 13 22 8 16 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.22" d="M 10 15 C 16 10 23 9 28 12.5 C 23 11 16 12 10 15 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 9 15 C 15 9.5 22 9 28 12.5" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" opacity="0.7" d="M 13 18 C 12 21 10 23 7 25 M 19 16 C 18 20 16 23 14 25 M 25 15 C 25 19 23 22 21 24 M 30 17 C 31 21 29 24 27 26" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" d="M 8 16 C 4 12 2 8 3 4 M 9 14 C 6 10 6 5 8 2" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="11" cy="13" r="1.1" />
       </symbol>
       <symbol id="c-krill" viewBox="0 0 160 110">
         <use href="#c-krill1" x="0" y="8" width="50" height="36" />
@@ -752,13 +762,15 @@
       </symbol>
 
       <symbol id="c-lanternfish" viewBox="0 0 110 46">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.12;stroke:none" d="M 10 24 Q 30 8 60 9 Q 86 10 100 22 Q 86 34 58 34 Q 28 35 10 24 Z M 10 24 L 3 16 L 4.5 24 L 3 31 Z" />
-        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.1" cx="52" cy="31" rx="32" ry="6" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 13 22 Q 32 9 60 9.5 Q 84 11 98 21" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 10 24 L 3 16 M 10 24 L 3 31" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.5" d="M 52 9 Q 56 3 64 4 M 16 22 Q 50 17 86 19" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" cx="84" cy="20" r="4.6" />
-        <circle class="pupil" style="fill:currentColor" cx="85.5" cy="20" r="1.8" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.3;stroke:none" d="M 10 24 C 24 12 42 8 60 9 C 78 10 92 14 100 22 C 90 31 74 34 58 34 C 40 35 22 31 10 24 Z M 10 24 L 3 16 L 4.5 24 L 3 31 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.24" d="M 14 21 C 28 11 44 8.5 60 9.5 C 76 10.5 88 14 97 21 C 86 15 72 12 58 12 C 42 12 26 15 14 21 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.24" d="M 13 26 C 26 32 42 34.5 58 34 C 74 33.5 87 30 96 24 C 88 31 73 35 58 35.5 C 41 36 25 32 13 26 Z" />
+        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.12" cx="52" cy="31" rx="32" ry="7" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.8" d="M 13 22 C 28 11 44 9 60 9.5 C 76 10.5 88 14 98 21" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 10 24 L 3 16 M 10 24 L 3 31" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.55;stroke:none" cx="84" cy="20" r="5" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="84" cy="20" r="2.2" />
+        <circle class="pupil" style="fill:#fff;opacity:0.85" cx="82.5" cy="18.4" r="0.9" />
         <circle class="v-glow" style="fill:var(--accent)" cx="28" cy="30" r="1.3" />
         <circle class="v-glow" style="fill:var(--accent)" cx="38" cy="31.5" r="1.3" />
         <circle class="v-glow" style="fill:var(--accent)" cx="48" cy="32" r="1.3" />
@@ -768,13 +780,15 @@
       </symbol>
 
       <symbol id="c-hatchet" viewBox="0 0 74 84">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.12;stroke:none" d="M 16 28 Q 20 10 38 9 Q 54 10 58 22 Q 64 30 58 40 Q 52 64 38 70 Q 26 66 22 48 Q 14 40 16 28 Z" />
-        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.1" cx="33" cy="55" rx="9" ry="17" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 17 26 Q 21 11 38 9.5 Q 53 11 57 22" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.5" d="M 52 16 Q 58 12 60 6 M 23 40 Q 31 54 39 62" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 38 70 Q 36 78 42 82" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" cx="42" cy="24" r="5" />
-        <circle class="pupil" style="fill:currentColor" cx="43.5" cy="23" r="1.9" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.3;stroke:none" d="M 16 28 C 18 14 26 9 38 9 C 50 9 56 14 58 22 C 63 29 62 35 58 40 C 53 60 47 67 38 70 C 29 67 24 58 22 48 C 16 42 14 35 16 28 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.26" d="M 18 24 C 21 13 29 9.5 38 9.5 C 48 9.5 54 13 56 20 C 51 14 45 11.5 38 12 C 29 12.5 22 17 18 24 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.26" d="M 23 48 C 27 60 33 67 38 69 C 44 66 49 58 53 46 C 50 60 44 68 38 70.5 C 31 68 26 59 23 48 Z" />
+        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.12" cx="33" cy="55" rx="10" ry="18" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.8" d="M 17 26 C 19 13 28 9.5 38 9.5 C 49 10 55 14 57 22" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 38 70 C 36 75 38 79 42 82" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.55;stroke:none" cx="42" cy="24" r="5.4" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="42" cy="24" r="2.4" />
+        <circle class="pupil" style="fill:#fff;opacity:0.85" cx="40.4" cy="22.3" r="0.9" />
         <circle class="v-glow" style="fill:var(--accent)" cx="28" cy="44" r="1.4" />
         <circle class="v-glow" style="fill:var(--accent)" cx="31" cy="52" r="1.4" />
         <circle class="v-glow" style="fill:var(--accent)" cx="34" cy="60" r="1.4" />
@@ -798,15 +812,17 @@
       </symbol>
 
       <symbol id="c-gsquid" viewBox="0 0 150 212">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.1;stroke:none" d="M 75 6 Q 90 32 92 70 Q 94 96 86 108 L 64 108 Q 56 96 58 70 Q 60 32 75 6 Z M 60 36 Q 49 21 57 8 Q 63 19 64 34 Z M 90 36 Q 101 21 93 8 Q 87 19 86 34 Z M 64 108 Q 60 120 62 130 Q 75 134 88 130 Q 90 120 86 108 Z" />
-        <circle class="v-halo" style="fill:var(--accent)" opacity="0.12" cx="67" cy="119" r="12" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 62 56 Q 62 22 75 6 Q 86 20 89 42" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 60 36 Q 49 21 57 8 M 90 36 Q 101 21 93 8" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.45" d="M 70 20 Q 73 60 71 100" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 64 108 Q 58 122 62 130 M 86 108 Q 92 122 88 130" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" cx="67" cy="119" r="6.5" />
-        <circle class="pupil" style="fill:currentColor" cx="68.5" cy="119" r="2.4" />
-        <circle class="v-glow" style="fill:var(--accent)" cx="65" cy="117" r="1.4" />
+        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.05" cx="75" cy="100" rx="50" ry="90" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.28;stroke:none" d="M 75 6 C 86 24 91 46 92 70 C 93 88 91 100 86 108 L 64 108 C 59 100 57 88 58 70 C 59 46 64 24 75 6 Z M 60 36 C 52 28 49 17 57 8 C 61 17 63 26 64 34 Z M 90 36 C 98 28 101 17 93 8 C 89 17 87 26 86 34 Z M 64 108 C 61 116 61 124 62 130 C 70 133 80 133 88 130 C 89 124 89 116 86 108 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.2" d="M 64 50 C 65 32 69 16 75 7 C 71 20 68 36 68 52 C 68 72 69 90 71 104 C 66 90 63 70 64 50 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.24" d="M 84 30 C 87 46 89 64 88 82 C 87 94 85 102 83 107 C 87 100 90 88 91 72 C 92 56 89 40 84 30 Z" />
+        <circle class="v-halo" style="fill:var(--accent)" opacity="0.14" cx="67" cy="119" r="13" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.8" d="M 62 56 C 62 36 66 16 75 6 C 83 16 87 28 89 42" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 60 36 C 52 28 49 17 57 8 M 90 36 C 98 28 101 17 93 8" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 64 108 C 60 117 60 124 62 130 M 86 108 C 90 117 90 124 88 130" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.5;stroke:none" cx="67" cy="119" r="7" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="67" cy="119" r="3.4" />
+        <circle class="pupil" style="fill:#fff;opacity:0.85" cx="64.8" cy="116.6" r="1.1" />
         <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 58 130 Q 50 150 56 166" />
         <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 66 132 Q 62 154 68 170" />
         <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 84 132 Q 88 154 82 170" />
@@ -819,97 +835,108 @@
       </symbol>
 
       <symbol id="c-barreleye" viewBox="0 0 112 70">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.11;stroke:none" d="M 34 20 Q 62 10 86 20 Q 102 27 102 38 Q 102 50 84 56 Q 58 62 36 56 Q 20 50 20 38 Q 20 26 34 20 Z M 20 38 L 8 28 L 10 39 L 8 48 Z" />
-        <path class="v-body" style="fill:var(--accent);fill-opacity:0.07;stroke:none" d="M 56 18 Q 80 6 100 22 Q 92 16 80 14 Q 66 13 56 18 Z" />
-        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.11" cx="75" cy="15" rx="16" ry="8" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 38 19 Q 62 11 84 19" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" opacity="0.55" d="M 58 17 Q 82 6 100 24" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 70 24 V 14 M 79 24 V 14" />
-        <circle class="v-glow" style="fill:var(--accent)" cx="70" cy="13" r="2.6" />
-        <circle class="v-glow" style="fill:var(--accent)" cx="79" cy="13" r="2.6" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 20 38 L 8 28 M 20 40 L 8 48" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.5" d="M 56 58 Q 54 66 60 69 M 40 24 Q 36 38 42 52" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" cx="92" cy="34" r="1.6" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.28;stroke:none" d="M 34 20 C 52 12 70 13 86 20 C 97 25 102 31 102 38 C 102 47 96 53 84 56 C 67 61 49 60 36 56 C 25 52 20 46 20 38 C 20 30 25 24 34 20 Z M 20 38 L 8 28 L 10 39 L 8 48 Z" />
+        <path class="v-body" style="fill:var(--accent);fill-opacity:0.1;stroke:none" d="M 56 18 C 72 9 88 12 100 22 C 93 17 84 14 76 13.5 C 68 13 61 15 56 18 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.24" d="M 24 44 C 36 54 56 58 74 56 C 86 54 95 49 100 43 C 96 52 86 58 72 59.5 C 54 61 36 56 24 47 Z" />
+        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.13" cx="75" cy="15" rx="17" ry="9" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.6" d="M 38 19 C 54 12.5 70 13 84 19" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.55" d="M 58 17 C 74 8 90 11 100 24" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 70 24 V 14 M 79 24 V 14" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="70" cy="13" r="2.8" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="79" cy="13" r="2.8" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 20 38 L 8 28 M 20 40 L 8 48" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.5;stroke:none" cx="92" cy="34" r="1.8" />
       </symbol>
 
       <symbol id="c-vampire" viewBox="0 0 110 122">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.1;stroke:none" d="M 55 10 Q 88 26 92 64 Q 92 88 76 102 Q 66 93 55 99 Q 44 93 34 102 Q 18 88 18 64 Q 22 26 55 10 Z M 42 20 Q 30 8 20 12 Q 30 17 38 25 Z M 68 20 Q 80 8 90 12 Q 80 17 72 25 Z" />
-        <circle class="v-halo" style="fill:var(--accent)" opacity="0.12" cx="42" cy="54" r="12" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 32 21 Q 43 12 55 10 Q 67 12 78 21" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 55 10 Q 88 26 92 64 Q 92 88 76 102" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 55 10 Q 22 26 18 64 Q 18 88 34 102" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 34 102 Q 44 92 55 99 Q 66 92 76 102" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 42 20 Q 30 8 20 12 Q 30 17 38 25 M 68 20 Q 80 8 90 12 Q 80 17 72 25" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" cx="42" cy="54" r="7" />
-        <circle class="pupil" style="fill:currentColor" cx="44" cy="53" r="2.6" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.8" d="M 44 104 Q 42 112 46 118 M 64 104 Q 66 112 62 118" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" opacity="0.4" d="M 55 14 Q 56 50 55 94" />
+        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.06" cx="55" cy="58" rx="46" ry="54" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.28;stroke:none" d="M 55 10 C 76 18 90 36 92 64 C 93 80 87 93 76 102 C 69 95 62 94 55 99 C 48 94 41 95 34 102 C 23 93 17 80 18 64 C 20 36 34 18 55 10 Z M 42 20 C 35 11 27 8 20 12 C 27 16 33 20 38 25 Z M 68 20 C 75 11 83 8 90 12 C 83 16 77 20 72 25 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.18" d="M 36 19 C 42 13 48 10.5 55 10.5 C 62 10.5 68 13 74 19 C 68 15 62 13 55 13 C 48 13 42 15 36 19 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.28" d="M 22 80 C 28 92 38 99 47 99 C 42 96 37 98 34 102 C 28 97 24 89 22 80 Z M 88 80 C 82 92 72 99 63 99 C 68 96 73 98 76 102 C 82 97 86 89 88 80 Z" />
+        <circle class="v-halo" style="fill:var(--accent)" opacity="0.16" cx="42" cy="54" r="13" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.8" d="M 32 21 C 39 14 47 10.5 55 10.5 C 63 10.5 71 14 78 21" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 55 10 C 76 18 90 36 92 64 C 93 80 87 93 76 102" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 55 10 C 34 18 20 36 18 64 C 17 80 23 93 34 102" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 34 102 C 41 95 48 94 55 99 C 62 94 69 95 76 102" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.5;stroke:none" cx="42" cy="54" r="7.5" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="42" cy="54" r="3.6" />
+        <circle class="pupil" style="fill:#fff;opacity:0.85" cx="39.6" cy="51.5" r="1.1" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" opacity="0.8" d="M 44 104 C 42 110 43 115 46 118 M 64 104 C 66 110 65 115 62 118" />
         <circle class="v-glow" style="fill:var(--accent)" cx="55" cy="12" r="1.4" />
         <circle class="v-glow" style="fill:var(--accent)" cx="90" cy="60" r="1.2" />
         <circle class="v-glow" style="fill:var(--accent)" cx="20" cy="60" r="1.2" />
       </symbol>
 
       <symbol id="c-whale" viewBox="0 0 320 124">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.1;stroke:none" d="M 20 38 Q 12 56 17 76 Q 23 89 42 91 Q 92 96 152 86 Q 230 76 282 64 Q 294 61 300 58 Q 292 50 270 44 Q 222 28 132 26 Q 62 24 20 38 Z M 300 58 Q 312 44 308 32 Q 297 46 293 53 Z M 300 60 Q 314 70 308 84 Q 296 70 293 62 Z M 112 80 Q 114 98 98 104 Q 105 90 104 81 Z" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 20 38 Q 60 25 132 26 Q 220 28 268 43" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 20 38 Q 12 56 17 76 Q 23 89 42 91" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 300 58 Q 312 44 308 32 Q 297 46 293 53 M 300 60 Q 314 70 308 84 Q 296 70 293 62" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 22 80 Q 52 84 80 78" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 112 80 Q 114 98 98 104 Q 106 90 104 82" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.45" d="M 62 28 Q 60 56 64 86 M 182 34 Q 186 50 182 66 M 204 36 Q 208 50 204 64" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 30 34 Q 34 30 40 31" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" cx="86" cy="64" r="2" />
-        <circle class="v-glow" style="fill:var(--accent)" cx="86" cy="64" r="0.9" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.28;stroke:none" d="M 20 38 C 13 52 13 66 17 76 C 22 87 30 90 42 91 C 80 95 116 92 152 86 C 204 78 248 70 282 64 C 290 62 296 60 300 58 C 294 52 284 47 270 44 C 226 31 178 26 132 26 C 86 26 46 30 20 38 Z M 300 58 C 308 50 311 40 308 32 C 302 41 297 48 293 53 Z M 300 60 C 309 67 312 76 308 84 C 301 74 296 66 293 62 Z M 112 80 C 115 91 110 100 98 104 C 104 95 105 86 104 81 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.18" d="M 26 36 C 60 27 104 24.5 148 26 C 196 28 240 34 268 43 C 238 36 196 31 150 30 C 104 29 60 31 26 36 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.26" d="M 20 70 C 28 83 44 89 66 90 C 110 93 160 88 210 80 C 240 75 264 69 280 64 C 250 74 204 82 156 87 C 110 91 50 92 28 82 C 24 79 21 75 20 70 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.8" d="M 20 38 C 52 28 96 25 140 26 C 192 28 236 34 268 43" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 20 38 C 13 52 13 66 17 76 C 22 87 30 90 42 91" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 300 58 C 308 50 311 40 308 32 C 302 41 297 48 293 53 M 300 60 C 309 67 312 76 308 84 C 301 74 296 66 293 62" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 22 80 C 42 84 62 83 80 78" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 112 80 C 115 91 110 100 98 104" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.4" d="M 62 28 C 60 48 61 68 64 86 M 182 34 C 185 45 185 56 182 66" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.55;stroke:none" cx="86" cy="64" r="2.6" />
+        <circle class="pupil" style="fill:#fff;opacity:0.8" cx="85" cy="63" r="0.8" />
       </symbol>
 
       <symbol id="c-angler" viewBox="0 0 150 112">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.1;stroke:none" d="M 38 40 Q 56 18 90 24 Q 126 32 130 60 Q 127 87 97 95 Q 65 102 46 84 Q 32 68 38 40 Z M 38 44 Q 26 46 14 42 Q 22 55 36 57 Q 32 50 38 44 Z M 41 74 Q 27 77 13 70 Q 25 88 48 85 Q 43 80 41 74 Z" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 36 42 Q 54 20 88 24 Q 118 30 128 52" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 38 44 Q 26 46 14 42 Q 22 55 36 57" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 41 74 Q 27 77 13 70 Q 25 88 48 85" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 19 44 L 23 53 L 29 46 L 34 55 L 40 48" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 19 70 L 25 62 L 31 71 L 37 63 L 43 71" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.5" d="M 66 36 Q 61 60 71 84" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.5" d="M 96 30 Q 100 56 96 88" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" cx="60" cy="46" r="4" />
-        <circle class="pupil" style="fill:currentColor" cx="61" cy="45" r="1.5" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 64 24 Q 58 4 38 7" />
-        <circle class="v-halo" style="fill:var(--accent)" opacity="0.13" cx="37" cy="7" r="10" />
-        <circle class="v-glow" style="fill:var(--accent)" cx="37" cy="7" r="3.4" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 102 93 Q 108 102 120 104 Q 111 95 112 88" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.55" d="M 126 52 Q 137 47 141 38 M 128 66 Q 139 68 145 63" />
+        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.06" cx="82" cy="60" rx="62" ry="44" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.3;stroke:none" d="M 40 38 C 52 22 74 17 92 23 C 116 30 130 42 131 61 C 132 80 117 93 96 97 C 74 101 54 95 45 82 C 38 71 35 51 40 38 Z M 40 42 C 31 44 21 44 13 41 C 17 50 26 56 37 57 C 33 52 35 46 40 42 Z M 42 72 C 33 76 21 76 12 71 C 18 84 33 89 47 86 C 43 82 41 76 42 72 Z M 99 92 C 105 100 114 105 123 105 C 115 97 112 91 112 86 Z" />
+        <path class="v-light" style="fill:#eef7f5;fill-opacity:0.22" d="M 45 36 C 57 24 77 19 93 24 C 110 29 122 37 127 48 C 120 39 106 31 90 27 C 73 23 56 27 45 36 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.34" d="M 44 76 C 56 92 82 99 102 94 C 116 90 126 81 129 70 C 127 84 114 94 97 97 C 76 101 55 95 44 80 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.8" d="M 38 40 C 52 22 76 17 94 23 C 113 29 126 39 130 52" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 40 42 C 31 44 21 44 13 41 C 17 50 26 56 37 57" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 42 72 C 33 76 21 76 12 71 C 18 84 33 89 47 86" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 19 43 L 23 52 L 29 45 L 34 54 L 40 47" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 18 70 L 24 62 L 30 71 L 36 63 L 42 71" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.4" d="M 66 36 C 62 52 63 70 71 84" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.55;stroke:none" cx="61" cy="46" r="5" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="61" cy="46" r="2.2" />
+        <circle class="pupil" style="fill:#fff;opacity:0.85" cx="59.4" cy="44.2" r="0.9" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 64 24 C 62 12 52 5 38 7" />
+        <circle class="v-halo" style="fill:var(--accent)" opacity="0.09" cx="37" cy="7" r="15" />
+        <circle class="v-halo" style="fill:var(--accent)" opacity="0.18" cx="37" cy="7" r="8" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="37" cy="7" r="3.6" />
       </symbol>
 
       <symbol id="c-fang" viewBox="0 0 134 84">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.11;stroke:none" d="M 16 38 Q 28 12 62 14 Q 98 16 118 34 Q 124 42 118 50 Q 98 68 64 66 Q 46 67 32 62 Q 13 56 16 38 Z M 118 42 L 130 34 L 127 43 L 130 52 Z" />
-        <circle class="v-halo" style="fill:var(--accent)" opacity="0.1" cx="78" cy="32" r="9" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 18 34 Q 30 13 62 14.5 Q 96 17 116 33" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 16 38 Q 12 58 34 64 Q 50 68 62 64" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 16 40 Q 40 44 60 42" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 30 42 L 28 56 M 44 44 L 43 58" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 36 62 L 37 50 M 52 63 L 52 52" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" cx="78" cy="32" r="4.4" />
-        <circle class="pupil" style="fill:currentColor" cx="79" cy="31" r="1.7" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 118 42 L 130 34 M 118 44 L 130 52" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.5" d="M 84 64 Q 86 74 96 76 M 70 18 Q 74 32 70 46" />
+        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.06" cx="68" cy="42" rx="56" ry="34" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.3;stroke:none" d="M 16 38 C 24 18 42 13 62 14 C 86 15 106 22 118 34 C 123 41 122 46 118 50 C 104 64 84 68 64 66 C 50 67 38 65 32 62 C 18 56 13 47 16 38 Z M 118 42 L 130 34 L 127 43 L 130 52 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.2" d="M 22 30 C 32 17 46 13.5 62 14.5 C 84 16 102 22 114 32 C 100 24 82 19 62 18 C 46 17 32 21 22 30 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.28" d="M 24 56 C 38 64 58 67 76 64 C 94 61 108 54 116 46 C 110 58 94 65 76 67.5 C 56 70 36 65 24 56 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.8" d="M 18 34 C 28 16 44 13.5 62 14.5 C 86 16 104 23 116 33" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 16 38 C 13 50 20 59 34 64 C 44 67 54 67 62 64" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 16 40 C 30 43 46 44 60 42" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 30 42 L 28 56 M 44 44 L 43 58" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 36 62 L 37 50 M 52 63 L 52 52" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.55;stroke:none" cx="78" cy="32" r="4.8" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="78" cy="32" r="2.2" />
+        <circle class="pupil" style="fill:#fff;opacity:0.85" cx="76.5" cy="30.4" r="0.9" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 118 42 L 130 34 M 118 44 L 130 52" />
       </symbol>
 
       <symbol id="c-gulper" viewBox="0 0 244 112">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.1;stroke:none" d="M 10 34 Q 60 8 116 26 Q 126 40 126 58 Q 122 86 94 90 Q 28 96 10 34 Z" />
-        <circle class="v-halo" style="fill:var(--accent)" opacity="0.12" cx="236" cy="58" r="8" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 12 30 Q 60 9 114 25" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 10 36 Q 28 96 94 90 Q 122 86 126 60" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 116 26 Q 126 40 126 56" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.45" d="M 30 52 Q 60 74 96 78" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 126 60 Q 168 52 196 58 Q 220 63 234 56" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 196 58 Q 214 70 234 62" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" cx="112" cy="30" r="1.8" />
-        <circle class="v-glow" style="fill:var(--accent)" cx="236" cy="58" r="2.4" />
+        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.05" cx="70" cy="55" rx="68" ry="44" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.28;stroke:none" d="M 10 34 C 40 14 80 12 116 26 C 123 36 126 46 126 58 C 124 78 112 88 94 90 C 50 94 18 76 10 34 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.18" d="M 16 29 C 44 13 80 12 112 24 C 82 16 48 18 16 32 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.28" d="M 16 52 C 28 76 54 89 86 89 C 102 88 114 82 121 71 C 116 84 102 91 86 91.5 C 56 93 28 78 14 52 Z" />
+        <circle class="v-halo" style="fill:var(--accent)" opacity="0.14" cx="236" cy="58" r="9" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.8" d="M 12 30 C 42 13 78 13 114 25" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 10 36 C 20 78 50 93 94 90 C 114 88 124 78 126 60" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 116 26 C 122 36 126 46 126 56" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 126 60 C 152 53 176 54 196 58 C 212 61 226 60 234 56" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 196 58 C 208 66 222 67 234 62" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.5;stroke:none" cx="112" cy="30" r="2" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="236" cy="58" r="2.6" />
       </symbol>
 
       <symbol id="c-vent" viewBox="0 0 220 172">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.1;stroke:none" d="M 36 161 L 44 86 Q 52 72 60 86 L 70 161 Z M 122 162 L 128 112 Q 134 100 140 112 L 148 162 Z M 4 162 Q 60 154 110 159 Q 170 164 216 158 L 216 172 L 4 172 Z" />
-        <circle class="v-halo" style="fill:var(--accent)" opacity="0.1" cx="90" cy="124" r="16" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.28;stroke:none" d="M 36 161 L 44 86 C 48 76 56 76 60 86 L 70 161 Z M 122 162 L 128 112 C 131 104 137 104 140 112 L 148 162 Z M 4 162 C 40 156 76 156 110 159 C 148 162 184 161 216 158 L 216 172 L 4 172 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.16" d="M 38 150 L 44 88 C 46 82 50 80 53 82 C 49 84 47 88 46 94 L 41 150 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.26" d="M 58 92 L 67 158 L 62 158 L 55 94 Z M 137 114 L 145 159 L 140 159 L 134 116 Z" />
+        <circle class="v-halo" style="fill:var(--accent)" opacity="0.13" cx="90" cy="124" r="18" />
         <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 4 162 Q 60 156 110 160 Q 170 164 216 158" />
         <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2" d="M 37 156 L 44 86 Q 52 73 59 84" />
         <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 60 88 L 70 161" />
@@ -926,7 +953,8 @@
       </symbol>
 
       <symbol id="c-whalefall" viewBox="0 0 300 124">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.09;stroke:none" d="M 24 112 Q 18 92 34 84 Q 52 78 64 88 Q 70 96 66 112 Z M 4 114 Q 80 106 160 110 Q 240 116 296 110 L 296 124 L 4 124 Z" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.26;stroke:none" d="M 24 112 C 19 98 23 88 34 84 C 46 79 58 81 64 88 C 69 95 69 104 66 112 Z M 4 114 C 56 108 108 107 160 110 C 212 113 258 113 296 110 L 296 124 L 4 124 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.16" d="M 26 100 C 25 91 29 86 36 84 C 31 88 28 93 28 100 Z" />
         <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 4 114 Q 80 108 160 112 Q 240 116 296 110" />
         <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.8" d="M 25 104 Q 21 88 35 84 Q 50 79 62 87" />
         <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 30 104 Q 44 100 56 104" />
@@ -940,20 +968,26 @@
       </symbol>
 
       <symbol id="c-dumbo" viewBox="0 0 110 102">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.11;stroke:none" d="M 30 54 Q 30 18 55 16 Q 80 18 80 54 Q 80 74 55 78 Q 30 74 30 54 Z M 38 26 Q 22 12 12 20 Q 22 28 36 32 Z M 72 26 Q 88 12 98 20 Q 88 28 74 32 Z" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 34 36 Q 36 18 55 16.5 Q 74 18 76 36" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 38 26 Q 22 12 12 20 Q 22 28 36 32 M 72 26 Q 88 12 98 20 Q 88 28 74 32" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" cx="46" cy="46" r="4" />
-        <circle class="pupil" style="fill:currentColor" cx="47" cy="45" r="1.6" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" cx="64" cy="46" r="4" />
-        <circle class="pupil" style="fill:currentColor" cx="65" cy="45" r="1.6" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 34 70 Q 42 82 50 74 Q 56 84 64 74 Q 70 82 78 70" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.8" d="M 42 80 Q 40 90 46 94 M 68 80 Q 70 90 64 94" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" opacity="0.4" d="M 44 60 Q 55 64 66 60" />
+        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.06" cx="55" cy="50" rx="44" ry="42" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.3;stroke:none" d="M 30 54 C 30 28 40 16 55 16 C 70 16 80 28 80 54 C 80 70 70 78 55 78 C 40 78 30 70 30 54 Z M 38 26 C 31 16 20 13 12 20 C 20 27 28 31 36 32 Z M 72 26 C 79 16 90 13 98 20 C 90 27 82 31 74 32 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.22" d="M 34 34 C 37 21 45 16.5 55 16.5 C 65 16.5 73 21 76 34 C 71 24 64 19.5 55 19.5 C 46 19.5 39 24 34 34 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.24" d="M 32 62 C 38 72 46 77 55 77 C 64 77 72 72 78 62 C 74 73 65 79 55 79 C 45 79 36 73 32 62 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.8" d="M 34 36 C 36 21 45 16.5 55 16.5 C 65 16.5 74 21 76 36" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 38 26 C 31 16 20 13 12 20 C 20 27 28 31 36 32 M 72 26 C 79 16 90 13 98 20 C 90 27 82 31 74 32" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.55;stroke:none" cx="46" cy="46" r="4.6" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="46" cy="46" r="2" />
+        <circle class="pupil" style="fill:#fff;opacity:0.85" cx="44.6" cy="44.5" r="0.9" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.55;stroke:none" cx="64" cy="46" r="4.6" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="64" cy="46" r="2" />
+        <circle class="pupil" style="fill:#fff;opacity:0.85" cx="62.6" cy="44.5" r="0.9" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 34 70 C 40 79 46 80 50 74 C 54 80 60 80 64 74 C 68 80 74 79 78 70" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" opacity="0.8" d="M 42 80 C 40 86 41 91 46 94 M 68 80 C 70 86 69 91 64 94" />
       </symbol>
 
       <symbol id="c-titanic" viewBox="0 0 320 152">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.09;stroke:none" d="M 40 140 L 56 70 Q 130 76 208 92 L 202 104 L 212 112 L 204 122 L 214 132 L 210 140 Z M 4 144 Q 90 136 180 140 Q 260 146 316 140 L 316 152 L 4 152 Z" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.26;stroke:none" d="M 40 140 L 56 70 C 108 74 158 81 208 92 L 202 104 L 212 112 L 204 122 L 214 132 L 210 140 Z M 4 144 C 64 138 124 137 180 140 C 232 143 278 143 316 140 L 316 152 L 4 152 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.14" d="M 56 70 C 108 74 158 81 206 91 L 205 95 C 158 85 108 78 57 74 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.3" d="M 44 124 L 41 138 L 208 138 L 211 132 L 206 124 Z" />
         <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 4 144 Q 90 138 180 142 Q 260 146 316 140" />
         <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.7" d="M 40 140 L 56 70" />
         <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 56 70 Q 130 76 206 91" />
@@ -969,69 +1003,81 @@
       </symbol>
 
       <symbol id="c-tripod" viewBox="0 0 130 122">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.1;stroke:none" d="M 44 52 Q 58 40 76 44 Q 90 48 94 56 Q 90 66 74 68 Q 56 68 48 62 Q 42 58 44 52 Z M 4 114 Q 60 106 126 114 L 126 122 L 4 122 Z" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 4 114 Q 60 108 126 114" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2" d="M 46 50 Q 58 41 76 44.5 Q 88 48 93 55" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 52 64 L 36 112 M 70 68 L 66 112 M 92 60 L 110 112" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 60 44 Q 58 28 64 18" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 94 56 L 104 50 M 94 58 L 104 62" />
-        <circle class="v-glow" style="fill:var(--accent)" cx="56" cy="54" r="1.4" />
+        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.06" cx="68" cy="62" rx="44" ry="36" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.3;stroke:none" d="M 44 52 C 52 43 64 41 76 44 C 86 47 92 51 94 56 C 92 63 84 67 74 68 C 63 68 53 66 48 62 C 44 59 42 55 44 52 Z M 94 56 L 104 50 L 102 56.5 L 104 62 Z M 4 114 C 46 108 88 108 126 114 L 126 122 L 4 122 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.22" d="M 47 50 C 55 43.5 66 42 76 44.5 C 84 46.5 90 50 92 54 C 87 50 79 47 70 46 C 61 45 52 46.5 47 50 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.22" d="M 47 60 C 54 65 64 67 74 66.5 C 83 66 90 62 93 57 C 91 64 83 68 73 68.5 C 62 69 52 66 47 60 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 4 114 C 46 109 88 109 126 114" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.4" d="M 46 50 C 55 42.5 66 41.5 76 44.5 C 85 47 91 50 93 55" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 52 64 L 36 112 M 70 68 L 66 112 M 92 60 L 110 112" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 60 44 C 58 35 60 25 64 18" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="56" cy="54" r="1.6" />
       </symbol>
 
       <symbol id="c-seapig" viewBox="0 0 130 82">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.11;stroke:none" d="M 28 56 Q 26 34 48 28 Q 74 22 96 32 Q 110 38 106 52 Q 100 64 76 66 Q 44 68 28 56 Z" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 4 74 Q 64 68 126 74" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 30 50 Q 28 35 48 29 Q 72 23 93 31" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 40 64 V 72 M 56 66 V 73 M 72 66 V 73 M 88 62 V 71" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" d="M 52 28 Q 52 20 56 17 M 70 25 Q 70 17 74 14" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.8" d="M 98 36 Q 106 30 110 32 M 100 44 Q 110 42 114 45" />
-        <circle class="v-glow" style="fill:var(--accent)" cx="56" cy="16" r="1" />
-        <circle class="v-glow" style="fill:var(--accent)" cx="74" cy="13" r="1" />
+        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.06" cx="66" cy="46" rx="48" ry="28" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.3;stroke:none" d="M 28 56 C 25 40 32 31 48 28 C 66 24 84 26 96 32 C 107 38 109 45 106 52 C 102 62 90 66 76 66 C 54 68 36 64 28 56 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.24" d="M 31 47 C 30 37 36 31 48 29 C 64 26 80 27.5 92 32 C 80 30 64 29.5 50 32 C 40 34 33 39 31 47 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.24" d="M 30 56 C 40 63 56 66 74 65 C 88 64 99 60 104 53 C 101 61 90 66.5 76 67.5 C 56 69 38 64 30 56 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 4 74 C 44 69 86 69 126 74" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.6" d="M 30 50 C 28 39 35 31.5 48 29 C 64 26 80 27 93 31" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 40 64 V 72 M 56 66 V 73 M 72 66 V 73 M 88 62 V 71" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 52 28 C 52 23 53 19 56 17 M 70 25 C 70 20 71 16 74 14" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="56" cy="16" r="1.2" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="74" cy="13" r="1.2" />
       </symbol>
 
       <symbol id="c-rattail" viewBox="0 0 240 92">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.1;stroke:none" d="M 18 40 Q 32 14 72 14 Q 102 16 112 34 Q 172 40 230 58 Q 160 66 96 62 Q 58 60 36 56 Q 15 50 18 40 Z" />
-        <circle class="v-halo" style="fill:var(--accent)" opacity="0.11" cx="58" cy="34" r="13" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 20 36 Q 34 15 72 14.5 Q 100 16 110 32" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 18 40 Q 14 48 20 52 Q 32 60 50 58" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 112 34 Q 172 40 232 58" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 50 58 Q 124 66 230 62" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.7" d="M 84 16 L 82 6 M 100 22 L 102 12 M 116 30 L 120 21 M 134 35 L 138 26 M 152 40 L 156 31 M 170 44 L 174 36" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" cx="58" cy="34" r="7.5" />
-        <circle class="pupil" style="fill:currentColor" cx="60" cy="33" r="2.8" />
-        <circle class="v-glow" style="fill:var(--accent)" cx="56" cy="31" r="1.3" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 34 54 Q 34 60 30 64" />
+        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.05" cx="100" cy="40" rx="90" ry="34" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.28;stroke:none" d="M 18 40 C 26 22 46 14 72 14 C 92 15 105 22 112 34 C 152 38 192 46 230 58 C 184 64 138 64 96 62 C 70 60 48 58 36 56 C 22 52 15 46 18 40 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.2" d="M 23 33 C 33 19 50 14.5 72 14.5 C 90 15.5 102 21 109 31 C 100 24 86 19 70 18.5 C 50 18 33 24 23 33 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.24" d="M 24 50 C 42 57 70 60.5 100 61.5 C 144 63 186 62 222 58.5 C 182 65 138 65.5 96 63.5 C 68 62 44 59 28 53 Z" />
+        <circle class="v-halo" style="fill:var(--accent)" opacity="0.13" cx="58" cy="34" r="14" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.8" d="M 20 36 C 30 19 48 14.5 72 14.5 C 92 15.5 103 21 110 32" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.5" d="M 18 40 C 14 46 16 50 20 52 C 28 57 38 59 50 58" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 112 34 C 152 38 192 46 232 58" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.4" d="M 50 58 C 108 65 168 66 230 62" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.6" d="M 84 16 L 82 6 M 100 22 L 102 12 M 116 30 L 120 21 M 134 35 L 138 26 M 152 40 L 156 31 M 170 44 L 174 36" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.5;stroke:none" cx="58" cy="34" r="8" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="58" cy="34" r="3.8" />
+        <circle class="pupil" style="fill:#fff;opacity:0.85" cx="55.4" cy="31.4" r="1.2" />
       </symbol>
 
       <symbol id="c-snailfish" viewBox="0 0 170 80">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.09;stroke:none" d="M 20 36 Q 22 16 46 13 Q 68 12 78 24 Q 120 28 158 44 Q 140 56 112 60 Q 70 64 32 54 Q 20 50 20 36 Z" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 22 30 Q 26 16 46 13.5 Q 66 13 77 23" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 78 24 Q 120 28 158 44 Q 140 56 112 60 Q 70 64 32 54" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.55" d="M 84 26 Q 96 22 104 26 M 112 28 Q 124 26 132 32 M 138 34 Q 148 34 154 40" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.55" d="M 48 56 Q 58 64 70 62 M 36 20 Q 50 18 62 22" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.1" cx="38" cy="28" r="2" />
-        <circle class="v-glow" style="fill:var(--accent)" cx="38" cy="28" r="0.9" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" d="M 24 42 Q 30 44 36 43" />
+        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.06" cx="80" cy="38" rx="68" ry="30" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.26;stroke:none" d="M 20 36 C 21 22 31 14 46 13 C 60 12 71 16 78 24 C 108 27 136 34 158 44 C 146 53 130 58 112 60 C 82 63 52 61 32 54 C 23 50 20 44 20 36 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.22" d="M 23 28 C 27 17 36 13.5 46 13.5 C 58 13 68 17 75 23 C 67 18 57 16 46 16.5 C 36 17 28 21 23 28 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.2" d="M 26 48 C 42 57 70 61 100 60 C 122 59 140 54 152 47 C 142 55 124 60.5 104 62 C 76 64 48 60 26 50 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.6" d="M 22 30 C 25 17 35 13.5 46 13.5 C 59 13 70 17 77 23" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 78 24 C 108 27 136 34 158 44 C 146 53 130 58 112 60 C 82 63 52 61 32 54" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.5;stroke:none" cx="38" cy="28" r="2.4" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="38" cy="28" r="1.1" />
       </symbol>
 
       <symbol id="c-amphi" viewBox="0 0 122 84">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.1;stroke:none" d="M 20 42 Q 28 16 58 14 Q 88 16 96 38 Q 100 52 90 62 Q 68 55 44 49 Q 27 46 20 42 Z" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2" d="M 22 38 Q 30 17 58 14.5 Q 86 17 95 36" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.2" d="M 96 40 Q 99 53 90 62" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.6" d="M 42 17 L 40 36 M 56 14 L 56 36 M 70 16 L 72 36 M 82 22 L 86 42" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" opacity="0.7" d="M 34 42 Q 32 52 26 56 M 44 44 Q 43 54 38 59 M 54 45 Q 54 55 49 60 M 64 45 Q 66 55 61 60 M 74 44 Q 77 53 73 58" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="0.9" d="M 22 38 Q 8 32 4 20 M 24 44 Q 10 46 4 40" />
-        <circle class="v-glow" style="fill:var(--accent)" cx="27" cy="33" r="1.3" />
+        <ellipse class="v-halo" style="fill:var(--accent)" opacity="0.06" cx="58" cy="40" rx="48" ry="32" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.3;stroke:none" d="M 20 42 C 24 24 38 15 58 14 C 78 15 91 24 96 38 C 99 48 97 56 90 62 C 74 56 56 51 44 49 C 32 47 24 45 20 42 Z" />
+        <path class="v-light" style="fill:#f3f9f0;fill-opacity:0.22" d="M 24 35 C 30 21 42 15 58 14.5 C 74 15 86 21 93 33 C 84 24 72 19 58 18.5 C 44 18 32 24 24 35 Z" />
+        <path class="v-shade" style="fill:#01060b;fill-opacity:0.22" d="M 26 44 C 40 49 60 53 78 57 C 84 58 88 60 90 61 C 76 56 58 51.5 44 49.5 C 36 48 30 46 26 44 Z" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.4" d="M 22 38 C 28 22 40 15 58 14.5 C 76 15 88 22 95 36" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.3" d="M 96 40 C 99 49 97 56 90 62" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.55" d="M 42 17 L 40 36 M 56 14 L 56 36 M 70 16 L 72 36 M 82 22 L 86 42" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" opacity="0.7" d="M 34 42 C 33 49 30 53 26 56 M 48 45 C 47 52 44 56 40 59 M 62 46 C 62 53 59 57 55 60 M 74 44 C 76 51 74 55 71 58" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1" d="M 22 38 C 13 33 7 27 4 20 M 24 44 C 16 45 9 44 4 40" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="27" cy="33" r="1.4" />
       </symbol>
 
       <symbol id="c-eye" viewBox="0 0 140 90">
-        <path class="v-body" style="fill:currentColor;fill-opacity:0.07;stroke:none" d="M 10 45 Q 70 3 130 45 Q 70 87 10 45 Z" />
-        <circle class="v-halo" style="fill:var(--accent)" opacity="0.08" cx="70" cy="45" r="32" />
-        <circle class="v-body" style="fill:currentColor;fill-opacity:0.12;stroke:none" cx="70" cy="45" r="23" />
-        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.8" d="M 10 45 Q 70 3 130 45 Q 70 87 10 45 Z" />
-        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" cx="70" cy="45" r="23" />
+        <circle class="v-halo" style="fill:var(--accent)" opacity="0.07" cx="70" cy="45" r="44" />
+        <path class="v-body" style="fill:currentColor;fill-opacity:0.16;stroke:none" d="M 10 45 C 28 18 48 6 70 6 C 92 6 112 18 130 45 C 112 72 92 84 70 84 C 48 84 28 72 10 45 Z" />
+        <circle class="v-halo" style="fill:var(--accent)" opacity="0.14" cx="70" cy="45" r="26" />
+        <circle class="v-body" style="fill:currentColor;fill-opacity:0.26;stroke:none" cx="70" cy="45" r="23" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="2.2" d="M 10 45 C 28 18 48 6 70 6 C 92 6 112 18 130 45" />
+        <path pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.6" d="M 130 45 C 112 72 92 84 70 84 C 48 84 28 72 10 45" />
+        <circle pathLength="1" vector-effect="non-scaling-stroke" stroke-width="1.8" cx="70" cy="45" r="23" />
         <path class="pupil" style="fill:currentColor" d="M 51 40.5 h 38 a 5 5 0 0 1 0 9 h -38 a 5 5 0 0 1 0 -9 Z" />
-        <circle class="v-glow" style="fill:var(--accent)" cx="58" cy="36" r="1.8" />
+        <circle class="v-glow" style="fill:var(--accent)" cx="57" cy="35" r="2.6" />
+        <circle class="pupil" style="fill:#fff;opacity:0.5" cx="84" cy="34" r="1.2" />
       </symbol>
 
       <symbol id="c-arms" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice">
@@ -1083,8 +1129,9 @@
         </svg>
 
         <svg class="boat" viewBox="0 0 150 80" xmlns="http://www.w3.org/2000/svg">
-          <path style="fill:currentColor;fill-opacity:0.14;stroke:none" d="M 14 56 L 22 72 Q 75 80 122 70 L 136 56 Z M 58 56 V 40 H 92 V 56 Z" />
-          <path stroke-width="2" d="M 14 56 L 22 72 Q 75 80 122 70 L 136 56 Z" />
+          <path style="fill:currentColor;fill-opacity:0.3;stroke:none" d="M 14 56 L 22 72 C 56 79 92 77 122 70 L 136 56 Z M 58 56 V 40 H 92 V 56 Z" />
+          <path style="fill:#01060b;opacity:0.2;stroke:none" d="M 18 64 L 22 72 C 56 79 92 77 122 70 L 128 64 C 94 72 54 73 18 64 Z" />
+          <path stroke-width="2" d="M 14 56 L 22 72 C 56 79 92 77 122 70 L 136 56 Z" />
           <path stroke-width="1.6" d="M 58 56 V 40 H 92 V 56" />
           <path stroke-width="1.4" d="M 66 40 V 30 H 84" />
           <line  stroke-width="1.4" x1="38" y1="56" x2="38" y2="10" />
@@ -1099,7 +1146,8 @@
           <circle class="lamp" cx="13" cy="6" r="3" />
         </svg>
         <svg class="ship" viewBox="0 0 220 56" xmlns="http://www.w3.org/2000/svg">
-          <path fill="currentColor" fill-opacity="0.16" stroke-width="1.5" d="M 8 36 L 16 50 H 202 L 212 36 Z" />
+          <path fill="currentColor" fill-opacity="0.3" stroke-width="1.5" d="M 8 36 L 16 50 H 202 L 212 36 Z" />
+          <path style="fill:currentColor;fill-opacity:0.16;stroke:none" d="M 40 36 V 27 H 94 V 36 Z M 102 36 V 23 H 138 V 36 Z M 168 36 V 14 H 188 V 36 Z" />
           <path stroke-width="1.1" d="M 40 36 V 27 H 94 V 36 M 102 36 V 23 H 138 V 36 M 146 36 V 29 H 160 V 36" />
           <path stroke-width="1.3" d="M 168 36 V 14 H 188 V 36" />
           <path stroke-width="0.9" d="M 171 19 H 185 M 171 24 H 185" />
@@ -1172,10 +1220,12 @@
           <circle cx="4" cy="50" r="1.5" />
           <circle cx="12" cy="56" r="1.1" />
         </g>
-        <path style="fill:currentColor;fill-opacity:0.1;stroke:none" d="M 22 56 Q 20 36 48 30 L 112 28 Q 142 30 150 48 Q 152 58 144 64 Q 120 76 70 74 Q 30 72 22 56 Z M 62 30 V 16 Q 62 12 67 12 H 88 Q 92 12 92 16 V 28 Z M 32 34 Q 24 22 36 18 L 46 29 Z" />
-        <circle style="fill:#ffe9c4;opacity:0.14;stroke:none" cx="152" cy="50" r="13" />
-        <path stroke-width="1.4" d="M 22 56 Q 20 36 48 30 L 112 28 Q 142 30 150 48 Q 152 58 144 64 Q 120 76 70 74 Q 30 72 22 56 Z" />
-        <path stroke-width="2.2" d="M 26 44 Q 30 33 48 30.5 L 112 28.5 Q 138 30 148 44" />
+        <path style="fill:currentColor;fill-opacity:0.24;stroke:none" d="M 22 56 C 20 42 28 33 48 30 L 112 28 C 134 29 146 36 150 48 C 152 55 150 60 144 64 C 126 74 96 76 70 74 C 42 72 26 66 22 56 Z M 62 30 V 16 C 62 13 64 12 67 12 H 88 C 91 12 92 13 92 16 V 28 Z M 32 34 C 26 28 27 21 36 18 L 46 29 Z" />
+        <path style="fill:#f3f9f0;opacity:0.16;stroke:none" d="M 27 42 C 31 34 39 31 48 30.5 L 112 28.5 C 128 29 140 33 146 41 C 138 35 126 32 112 31.5 L 50 33.5 C 40 34 31 37 27 42 Z" />
+        <path style="fill:#01060b;opacity:0.22;stroke:none" d="M 26 60 C 36 69 60 73.5 88 73 C 112 72.5 134 68 144 62 C 132 72 104 76.5 76 75.5 C 52 74.5 33 69 26 60 Z" />
+        <circle style="fill:#ffe9c4;opacity:0.16;stroke:none" cx="152" cy="50" r="14" />
+        <path stroke-width="1.4" d="M 22 56 C 20 42 28 33 48 30 L 112 28 C 134 29 146 36 150 48 C 152 55 150 60 144 64 C 126 74 96 76 70 74 C 42 72 26 66 22 56 Z" />
+        <path stroke-width="2.6" d="M 26 44 C 30 35 38 31 48 30.5 L 112 28.5 C 130 29.5 142 35 148 44" />
         <path stroke-width="1.5" d="M 62 30 V 16 Q 62 12 67 12 H 88 Q 92 12 92 16 V 28" />
         <path stroke-width="1.3" d="M 76 12 V 4 H 84" />
         <circle class="p-glass" stroke-width="1.4" cx="98" cy="50" r="9" />
