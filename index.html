@@ -216,7 +216,7 @@
       text-align: center; max-width: 680px;
     }
     .stack a { pointer-events: auto; }
-    .est, .wordmark, .ipa, .statement, .quiet, .names, .mail, .feature {
+    .est, .wordmark, .ipa, .statement, .quiet, .names, .mail {
       transition: color 450ms ease, text-shadow 450ms ease;
       text-shadow: var(--halo);
     }
@@ -250,10 +250,6 @@
     }
     .names .dot { color: var(--muted); margin: 0 14px; }
     .mail { font-size: 12.5px; letter-spacing: 0.05em; margin: 18px 0 0; }
-    .feature {
-      font-size: 9.5px; font-weight: 400; letter-spacing: 0.3em; text-indent: 0.3em;
-      text-transform: uppercase; color: var(--muted); margin: 34px 0 0;
-    }
 
     /* ================================================================
        5 · HUD — depth meter, zone, rail, copyright, dive cue
@@ -283,6 +279,13 @@
       font-size: 9px; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase;
       color: var(--muted); transition: color 450ms ease;
     }
+    .hud-copy .hsep { margin: 0 9px; opacity: 0.55; }
+    .hud-copy a {
+      pointer-events: auto; color: inherit; text-decoration: none;
+      transition: color 250ms ease;
+    }
+    .hud-copy a:hover { color: var(--accent); }
+    .hud-copy a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 1px; }
 
     .cue {
       position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
@@ -1328,19 +1331,18 @@
         <a href="https://www.linkedin.com/in/andrewhyi" target="_blank" rel="noopener" aria-label="Andrew — LinkedIn">Andrew</a><span class="dot" aria-hidden="true">·</span><a href="https://www.linkedin.com/in/ben" target="_blank" rel="noopener" aria-label="Ben — LinkedIn">Ben</a>
       </p>
       <p class="mail rise" style="--d: 0.58s"><a href="mailto:hello@octl.ai">hello@octl.ai</a></p>
-      <p class="feature rise" style="--d: 0.66s"><a href="creature-feature.html">creature feature</a></p>
     </div>
   </main>
 
   <!-- ··· instruments ··· -->
-  <div id="hud" aria-hidden="true">
-    <div class="hud-depth rise" style="--d: 0.7s">
+  <div id="hud">
+    <div class="hud-depth rise" style="--d: 0.7s" aria-hidden="true">
       <div class="m" id="hud-m">0 m</div>
       <div class="zone" id="hud-zone">sunlight zone</div>
     </div>
-    <div id="rail" class="rise" style="--d: 0.7s"><div class="dot" id="rail-dot"></div></div>
-    <div class="hud-copy rise" style="--d: 0.7s">&copy; 2026 Octl Labs, Inc.</div>
-    <div class="cue rise" id="cue" style="--d: 0.9s">the bottom is 10,935 m down <span class="arr">↓</span></div>
+    <div id="rail" class="rise" style="--d: 0.7s" aria-hidden="true"><div class="dot" id="rail-dot"></div></div>
+    <div class="hud-copy rise" style="--d: 0.7s">&copy; 2026 Octl Labs, Inc.<span class="hsep" aria-hidden="true">·</span><a href="creature-feature.html">creature feature</a></div>
+    <div class="cue rise" id="cue" style="--d: 0.9s" aria-hidden="true">the bottom is 10,935 m down <span class="arr">↓</span></div>
     <button id="snd" class="rise" style="--d: 0.8s" aria-pressed="false" aria-label="Toggle ambient sound">
       <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
         <path d="M 4 10 v 4 h 4 l 5 4.5 V 5.5 L 8 10 Z" />
