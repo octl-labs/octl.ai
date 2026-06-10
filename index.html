@@ -20,14 +20,16 @@
   <style>
     /* ================================================================
        1 · TOKENS & INK THEMES
-       The dive: 40.85 viewport-screens from the dawn surface to 10,935 m.
+       The dive: 41 viewport-screens from the dawn surface to 10,935 m.
        The opening frame IS the surface: waterline at 35lvh, ships riding
-       it, the sub bobbing just beneath. World-space art lives in #world
-       and scrolls natively; everything dynamic that is not world-locked
-       is fixed and driven by CSS vars written from a single rAF tick.
+       it, the sub bobbing just beneath, the meter at 0 m — depth is read
+       at the 35lvh reference line, where the waterline rests at load.
+       World-space art lives in #world and scrolls natively; everything
+       dynamic that is not world-locked is fixed and driven by CSS vars
+       written from a single rAF tick.
        ============================================================== */
     :root {
-      --total-screens: 40.85;       /* must equal the JS ZONES weight sum */
+      --total-screens: 41;          /* must equal the JS ZONES weight sum */
       --bg: #04070d;
       --accent: #6fe0cf;
       --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
@@ -102,10 +104,10 @@
     .bg-gradient {
       position: absolute; inset: 0;
       background-image: linear-gradient(180deg,
-        #f6e1ca 0%, #f2d3ae 0.4406%, #eab987 0.8078%, #de9d6b 0.8567%,
-        #2f9aa6 0.8568%, #1e8493 1.714%, #136075 3.608%, #0c4661 6.666%,
-        #082e4b 13.096%, #051c33 17.133%, #030f1d 22.272%, #020711 27.784%,
-        #010308 31.865%, #000000 38.387%, #000000 100%);
+        #f6e1ca 0%, #f2d3ae 0.439%, #eab987 0.8049%, #de9d6b 0.8536%,
+        #2f9aa6 0.8537%, #1e8493 1.7073%, #136075 3.5976%, #0c4661 6.6463%,
+        #082e4b 13.0488%, #051c33 17.0732%, #030f1d 22.1951%, #020711 27.6829%,
+        #010308 31.748%, #000000 38.252%, #000000 100%);
     }
 
     /* ---- dawn surface scene (sky band lives in 0–28lvh) -------------- */
@@ -387,7 +389,7 @@
     }
 
     /* trench walls close in through the hadal zone */
-    .trench { position: absolute; top: calc(28.85 * 100lvh); height: calc(12 * 100lvh); width: 16vw; color: rgba(165, 200, 212, 0.2); }
+    .trench { position: absolute; top: calc(29 * 100lvh); height: calc(12 * 100lvh); width: 16vw; color: rgba(165, 200, 212, 0.2); }
     .trench svg { width: 100%; height: 100%; }
     .trench path { fill: rgba(12, 18, 23, 0.6); stroke: currentColor; stroke-width: 1.6; vector-effect: non-scaling-stroke; }
     .trench-l { left: 0; }
@@ -1048,7 +1050,7 @@
     </defs>
   </svg>
 
-  <!-- ··· the world: scrolls natively, 40.85 screens deep ··· -->
+  <!-- ··· the world: scrolls natively, 41 screens deep ··· -->
   <div id="world" aria-hidden="true">
     <div class="world-inner">
       <div class="bg-gradient"></div>
@@ -1278,7 +1280,7 @@
   <!-- ··· instruments ··· -->
   <div id="hud" aria-hidden="true">
     <div class="hud-depth rise" style="--d: 0.7s">
-      <div class="m" id="hud-m">−6 m</div>
+      <div class="m" id="hud-m">0 m</div>
       <div class="zone" id="hud-zone">sunlight zone</div>
     </div>
     <div id="rail" class="rise" style="--d: 0.7s"><div class="dot" id="rail-dot"></div></div>
@@ -1302,9 +1304,10 @@
 
       /* ============ CONFIG — single source of truth ============ */
       var ZONES = [
-        /* the dive starts at −6 m: the waterline paints at 0.35 screens,
-           35% sky in the opening frame. body = top-overscroll color. */
-        { id: 'sunlight', label: 'sunlight zone',  d0: 6,     d1: 200,   screens: 4.85, body: '#f2d8ba' },
+        /* depth is read at the ALIGN reference line (35lvh — where the
+           waterline rests at load), so the dive starts at exactly 0 m.
+           body = top-overscroll color. */
+        { id: 'sunlight', label: 'sunlight zone',  d0: 0,     d1: 200,   screens: 5,    body: '#f2d8ba' },
         { id: 'twilight', label: 'twilight zone',  d0: 200,   d1: 1000,  screens: 6,   body: '#04182b' },
         { id: 'midnight', label: 'midnight zone',  d0: 1000,  d1: 4000,  screens: 10,  body: '#010306' },
         { id: 'abyss',    label: 'the abyss',      d0: 4000,  d1: 6000,  screens: 6,   body: '#000000' },
@@ -1335,6 +1338,10 @@
       }
 
       /* ============ MAPPING — depth ⇄ scroll ============ */
+      /* world art for depth d sits ALIGN screens below scrollAtDepth(d),
+         so the meter reads d as that art crosses the 35lvh reference
+         line — the waterline's resting position */
+      var ALIGN = 0.35;
       var vw = 0, vh = 0, worldH = 0, screenPx = 0, maxY = 0, railH = 0;
       var waterlinePx = 0, cruiseTop = 0, subGap = 46;
       var world = document.getElementById('world');
@@ -1456,7 +1463,7 @@
           var el = document.createElement('div');
           var cls = 'vignette' + (type !== 'creature' ? ' v-' + type : '');
           if (c.cls) cls += ' ' + c.cls;
-          c._S = scrollAtDepth(c.d) / screenPx + 0.5;
+          c._S = scrollAtDepth(c.d) / screenPx + ALIGN;
           el.style.top = (c._S * 100).toFixed(3) + 'lvh';
           if (type === 'creature') {
             if (c.d >= 1020 && c.cls !== 'v-ghost') cls += ' v-deep';
@@ -1601,7 +1608,7 @@
         setVarU('--sub-dip', Math.max(0, waterlinePx - y + subGap - cruiseTop), 'px', 0.5);
         if (FSM.s !== 'throw') windowPass(y); /* no churn during the flight */
 
-        dotEl.style.transform = 'translateY(' + ((y + vh * 0.5) / worldH * railH).toFixed(1) + 'px)';
+        dotEl.style.transform = 'translateY(' + ((y + ALIGN * screenPx) / worldH * railH).toFixed(1) + 'px)';
         if (!cueGone && y > screenPx * 0.4) { cueGone = true; cueEl.classList.add('gone'); }
       }
 
@@ -1972,7 +1979,7 @@
         for (var i = 1; i < ZONES.length; i++) {
           var t = document.createElement('div');
           t.className = 'tick';
-          t.style.top = ((ZONES[i].px0 + 0.5 * screenPx) / worldH * 100).toFixed(2) + '%';
+          t.style.top = ((ZONES[i].px0 + ALIGN * screenPx) / worldH * 100).toFixed(2) + '%';
           railEl.appendChild(t);
         }
       }
