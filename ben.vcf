@@ -1,0 +1,12 @@
+BEGIN:VCARD
+VERSION:3.0
+X-OCTL-NOTE:PRINTED ON BUSINESS CARDS — do not remove or rename /andrew, /ben, /andrew.vcf, /ben.vcf.
+N:Yi;Benjamin;;;
+FN:Benjamin Yi
+ORG:Octl Labs, Inc.
+TITLE:Cofounder
+EMAIL;TYPE=INTERNET,WORK:hello@octl.ai
+URL;TYPE=work:https://octl.ai
+URL:https://www.linkedin.com/in/bentbyi/
+URL:https://github.com/BENJYI
+END:VCARD
