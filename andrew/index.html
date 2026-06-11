@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<!-- PRINTED ON BUSINESS CARDS — do not remove or rename /andrew, /ben, /andrew.vcf, /ben.vcf. -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Andrew — octl</title>
+  <meta name="description" content="Andrew Yi — Cofounder, Octl Labs. AI-native productivity." />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#04070d" />
+  <meta name="robots" content="noindex" />
+
+  <!-- Clean unfurls in chat apps -->
+  <meta property="og:title" content="Andrew — octl" />
+  <meta property="og:description" content="Cofounder, Octl Labs" />
+  <meta property="og:url" content="https://octl.ai/andrew" />
+  <meta property="og:type" content="profile" />
+  <meta property="og:site_name" content="octl" />
+  <meta name="twitter:card" content="summary" />
+
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2304070d'/%3E%3Ctext x='32' y='46' text-anchor='middle' font-family='Georgia,serif' font-style='italic' font-size='42' fill='%236fe0cf'%3Eo%3C/text%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&family=Martian+Mono:wght@300;400&display=swap" />
+
+  <style>
+    /* Tokens lifted from the main site (index.html · dark ink theme). */
+    :root {
+      --bg: #04070d;
+      --accent: #f2d8ba;
+      --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
+      --mono: 'Martian Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+      --ink: #e9eef4;
+      --ink-soft: #c4cedb;
+      --muted: #7e8b9d;
+      --line: #18202e;
+      --halo: 0 0 14px rgba(2, 8, 14, 0.95), 0 1px 30px rgba(2, 8, 14, 0.6);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; }
+
+    body {
+      font-family: var(--mono);
+      color: var(--ink);
+      background-color: var(--bg);
+      /* one level deeper: a faint warm light from the surface, fading into the deep */
+      background-image:
+        radial-gradient(120% 80% at 50% -10%, rgba(242, 216, 186, 0.07), transparent 60%),
+        radial-gradient(100% 70% at 50% 120%, rgba(2, 9, 16, 0.9), transparent 70%);
+      background-attachment: fixed;
+      min-height: 100svh;
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+
+    a { color: var(--ink); text-decoration: none; }
+
+    .wrap {
+      max-width: 440px;
+      margin: 0 auto;
+      min-height: 100svh;
+      padding: clamp(40px, 9vh, 84px) 24px 28px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .rise { animation: rise 800ms cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 0s); }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @media (prefers-reduced-motion: reduce) { .rise { animation: none; } }
+
+    /* Brand lockup — the octl mark + wordmark, linking home */
+    .brand {
+      display: inline-flex; align-items: center; gap: 11px;
+      align-self: flex-start;
+    }
+    .brand .mark { width: 30px; height: 30px; border-radius: 8px; display: block; }
+    .brand .word {
+      font-family: var(--serif); font-optical-sizing: auto; font-weight: 380;
+      font-size: 23px; letter-spacing: -0.01em; color: var(--ink);
+      text-shadow: var(--halo);
+    }
+    .brand:hover .word { color: var(--accent); }
+    .brand:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 3px; }
+
+    .head { margin-top: clamp(40px, 11vh, 96px); }
+
+    .name {
+      font-family: var(--serif); font-optical-sizing: auto; font-weight: 400;
+      font-size: clamp(2.7rem, 12vw, 3.6rem); line-height: 0.96; letter-spacing: -0.015em;
+      margin: 0; color: var(--ink); text-shadow: var(--halo);
+    }
+    .title {
+      font-size: 10px; font-weight: 400; letter-spacing: 0.34em; text-indent: 0.34em;
+      text-transform: uppercase; color: var(--muted); margin: 20px 0 0;
+    }
+    .descriptor {
+      font-family: var(--serif); font-optical-sizing: auto; font-style: italic; font-weight: 360;
+      font-size: 1.05rem; line-height: 1.4; color: var(--ink-soft);
+      margin: 26px 0 0;
+    }
+    .descriptor a { color: var(--ink-soft); border-bottom: 1px solid var(--line); padding-bottom: 1px; }
+    .descriptor a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+    /* Action buttons — large tap targets, single column */
+    .actions { margin-top: clamp(34px, 7vh, 56px); display: flex; flex-direction: column; gap: 12px; }
+    .btn {
+      display: flex; align-items: center; gap: 13px;
+      min-height: 54px; padding: 0 20px;
+      border: 1px solid var(--line); border-radius: 13px;
+      font-family: var(--mono); font-size: 13px; font-weight: 400; letter-spacing: 0.04em;
+      color: var(--ink);
+      transition: border-color 220ms ease, color 220ms ease, background-color 220ms ease, transform 120ms ease;
+    }
+    .btn .ic { width: 19px; height: 19px; flex: none; opacity: 0.85; }
+    .btn .lbl { flex: 1; }
+    .btn .arr { color: var(--muted); font-size: 15px; }
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn:hover .arr { color: var(--accent); }
+    .btn:active { transform: translateY(1px); }
+    .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+    .btn.primary {
+      background: var(--accent); color: #04070d; border-color: var(--accent);
+      font-weight: 400; letter-spacing: 0.05em;
+    }
+    .btn.primary .ic { opacity: 1; }
+    .btn.primary .arr { color: rgba(4, 7, 13, 0.5); }
+    .btn.primary:hover { background: #f7e6d2; color: #04070d; }
+    .btn.primary:hover .arr { color: rgba(4, 7, 13, 0.6); }
+
+    footer {
+      margin-top: auto; padding-top: 48px;
+      font-size: 9px; font-weight: 400; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <a class="brand rise" href="https://octl.ai" aria-label="octl — home">
+      <svg class="mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <rect width="64" height="64" rx="14" fill="#0b1119" stroke="#18202e" stroke-width="1.5" />
+        <text x="32" y="46" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-style="italic" font-size="42" fill="#f2d8ba">o</text>
+      </svg>
+      <span class="word">octl</span>
+    </a>
+
+    <div class="head">
+      <h1 class="name rise" style="--d: 0.06s">Andrew Yi</h1>
+      <p class="title rise" style="--d: 0.12s">Cofounder, Octl Labs</p>
+      <p class="descriptor rise" style="--d: 0.18s">
+        <a href="https://octl.ai">AI-native productivity</a>
+      </p>
+    </div>
+
+    <nav class="actions rise" style="--d: 0.26s" aria-label="Contact Andrew">
+      <a class="btn primary" href="/andrew.vcf" download>
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M19 8v6M22 11h-6"/></svg>
+        <span class="lbl">Save contact</span>
+        <span class="arr" aria-hidden="true">&darr;</span>
+      </a>
+      <a class="btn" href="mailto:hello@octl.ai">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="m3 6 9 6.5L21 6"/></svg>
+        <span class="lbl">Email</span>
+        <span class="arr" aria-hidden="true">&rarr;</span>
+      </a>
+      <a class="btn" href="https://www.linkedin.com/in/andrewhyi?utm_source=business_card&utm_medium=qr&utm_content=andrew" target="_blank" rel="noopener">
+        <svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.98 3.5A2.5 2.5 0 1 1 0 3.5a2.5 2.5 0 0 1 4.98 0zM.4 8.2h4.2V24H.4zM8.3 8.2h4v2.2h.06c.56-1.05 1.92-2.16 3.96-2.16 4.24 0 5.02 2.78 5.02 6.4V24h-4.2v-6.6c0-1.58-.03-3.6-2.2-3.6-2.2 0-2.54 1.72-2.54 3.5V24H8.3z"/></svg>
+        <span class="lbl">LinkedIn</span>
+        <span class="arr" aria-hidden="true">&nearr;</span>
+      </a>
+      <a class="btn" href="https://github.com/yizyace?utm_source=business_card&utm_medium=qr&utm_content=andrew" target="_blank" rel="noopener">
+        <svg class="ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.65.5.5 5.65.5 12a11.5 11.5 0 0 0 7.86 10.92c.575.106.785-.25.785-.555 0-.274-.01-1-.015-1.965-3.196.695-3.87-1.54-3.87-1.54-.523-1.33-1.277-1.683-1.277-1.683-1.044-.714.08-.699.08-.699 1.154.082 1.762 1.185 1.762 1.185 1.026 1.758 2.692 1.25 3.348.955.104-.743.402-1.25.73-1.538-2.552-.29-5.236-1.276-5.236-5.677 0-1.254.448-2.28 1.183-3.084-.119-.29-.513-1.46.112-3.042 0 0 .965-.309 3.163 1.178a11 11 0 0 1 5.76 0c2.196-1.487 3.16-1.178 3.16-1.178.626 1.582.232 2.752.114 3.042.737.804 1.18 1.83 1.18 3.084 0 4.412-2.688 5.384-5.248 5.668.413.355.78 1.057.78 2.13 0 1.538-.014 2.778-.014 3.156 0 .308.207.667.79.554A11.5 11.5 0 0 0 23.5 12C23.5 5.65 18.35.5 12 .5z"/></svg>
+        <span class="lbl">GitHub</span>
+        <span class="arr" aria-hidden="true">&nearr;</span>
+      </a>
+    </nav>
+
+    <footer class="rise" style="--d: 0.34s">&copy; 2026 Octl Labs, Inc.</footer>
+  </main>
+</body>
+</html>
